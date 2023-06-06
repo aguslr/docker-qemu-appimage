@@ -33,6 +33,11 @@ and they will be copied and loaded at runtime:
 | `iso`     | CD-ROM      | `-cdrom` |
 | `img`     | Floppy disk | `-fda`   |
 
+These files will be read-only, therefore [changes to the disk][3] will be saved
+to a *QCOW2* image in a directory named after the AppImage inside
+`${XDG_DATA_HOME}/qemu.appimage`, unless we pass the `-snapshot` argument to the
+AppImage.
+
 
 Build locally
 -------------
@@ -51,3 +56,4 @@ Instead of pulling the image from a remote repository, you can build it locally:
 
 [1]: https://github.com/aguslr/docker-qemu-appimage
 [2]: https://github.com/qemu/qemu/blob/45ae97993a75f975f1a01d25564724c7e10a543f/configure#L831
+[3]: http://web.archive.org/web/http://dustymabe.com/2015/01/11/qemu-img-backing-files-a-poor-mans-snapshotrollback/

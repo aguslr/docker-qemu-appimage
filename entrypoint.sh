@@ -57,30 +57,63 @@ mkdir -p /AppDir/usr/share/applications/ && \
 	EOF
 
 # Create AppRun script
-cat <<- 'EOF' > /AppDir/AppRun
+cat << 'EOF' > /AppDir/AppRun
 #!/bin/sh
 
+# Set environment
 HERE="$(dirname "$(readlink -f "${0}")")"
+APPIMAGE=$(basename "$ARGV0")
+APPIMAGE_NAME="${APPIMAGE%.*}"
 
 # Set paths
-export PATH="${HERE}/usr/bin":${PATH}
+PATH="${HERE}/usr/bin":${PATH}
+LD_LIBRARY_PATH="${HERE}/usr/lib":${LD_LIBRARY_PATH}
+export PATH LD_LIBRARY_PATH
 
 # Make sure that XDG_CONFIG_HOME and XDG_DATA_HOME are set
 export XDG_CONFIG_HOME="${XDG_CONFIG_HOME:=$HOME/.config}"
 export XDG_DATA_HOME="${XDG_DATA_HOME:=$HOME/.local/share}"
-EOF
-# Add images if they exist
-[ -f /input/disk.qcow2 ] && printf 'OPTS="${OPTS} -hda ${HERE}/disk.qcow2"'  >> /AppDir/AppRun
-[ -f /input/floppy.img ] && printf 'OPTS="${OPTS} -fda ${HERE}/floppy.img"'  >> /AppDir/AppRun
-[ -f /input/cdrom.iso ]  && printf 'OPTS="${OPTS} -cdrom ${HERE}/cdrom.iso"' >> /AppDir/AppRun
-# Add executable and options
-cat <<- EOF >> /AppDir/AppRun
 
-	if [ "\${1}" ]; then
-		${executable} \${OPTS} ${QEMU_OPTS} "\${@}"
+# Check arguments
+for ARG in "${@}"; do
+	[ "${ARG}" = '-snapshot' ] && SNAPSHOT=1
+done
+
+# Create file for disk image
+if [ -f "${HERE}/disk.qcow2" ]; then
+	# Check for disk image
+	if [ -f "${QEMU_DATA}/disk.qcow2" ]; then
+		# Create directory structure
+		QEMU_DATA="${XDG_DATA_HOME}/qemu.appimage/${APPIMAGE_NAME:-QEMU}" && \
+			mkdir -p "${QEMU_DATA}"
+		# Rebase backing file
+		qemu-img rebase -f qcow2 -u -b "${HERE}/disk.qcow2" -F qcow2 \
+			"${QEMU_DATA}/disk.qcow2" \
+			&& OPTS="${OPTS} -hda ${QEMU_DATA}/disk.qcow2" \
+			|| OPTS="${OPTS} -hda ${HERE}/disk.qcow2"
+	elif [ ! "${SNAPSHOT}" ]; then
+		# Create directory structure
+		QEMU_DATA="${XDG_DATA_HOME}/qemu.appimage/${APPIMAGE_NAME:-QEMU}" && \
+			mkdir -p "${QEMU_DATA}"
+		# Create disk image
+		qemu-img create -f qcow2 -b "${HERE}/disk.qcow2" -F qcow2 \
+			"${QEMU_DATA}/disk.qcow2" \
+			&& OPTS="${OPTS} -hda ${QEMU_DATA}/disk.qcow2" \
+			|| OPTS="${OPTS} -hda ${HERE}/disk.qcow2"
 	else
-		${executable} \${OPTS} ${QEMU_OPTS} -snapshot
+		OPTS="${OPTS} -hda ${HERE}/disk.qcow2"
 	fi
+fi
+
+# Add options for other images
+[ -f "${HERE}/floppy.img" ] && OPTS="${OPTS} -fda ${HERE}/floppy.img"
+[ -f "${HERE}/cdrom.iso" ]  && OPTS="${OPTS} -cdrom ${HERE}/cdrom.iso"
+
+EOF
+# Add executable and options
+cat << EOF >> /AppDir/AppRun
+# Run QEMU
+${executable} \${OPTS} ${QEMU_OPTS} "\${@}"
 EOF
 chmod a+x /AppDir/AppRun
 
