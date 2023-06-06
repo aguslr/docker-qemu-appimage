@@ -15,10 +15,23 @@ to the `configure` script][2] before compiling QEMU:
 
 1. Clone and start the container:
 
-       docker run -v "${PWD}"/output:/output \
+       docker run \
+         -v "${PWD}"/input:/input -v "${PWD}"/output:/output \
          docker.io/aguslr/qemu-appimage:latest --target-list=i386-softmmu
 
 2. Find the generated AppImage in `./output`.
+
+
+### Disk images
+
+We can place disk images (QCOW2, ISO, raw images, etc.) in an `input` directory
+and they will be copied and loaded at runtime:
+
+| Extension | Function    | Device   |
+| :-------- | :---------- | :------- |
+| `qcow2`   | Hard drive  | `-hda`   |
+| `iso`     | CD-ROM      | `-cdrom` |
+| `img`     | Floppy disk | `-fda`   |
 
 
 Build locally

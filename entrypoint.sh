@@ -52,15 +52,52 @@ mkdir -p /AppDir/usr/share/applications/ && \
 	Exec=${executable}
 	Terminal=false
 	Type=Application
-	Icon=${ICON:-qemu}
+	Icon=qemu
 	Categories=System;Emulator;
 	EOF
 
+# Create AppRun script
+cat <<- 'EOF' > /AppDir/AppRun
+#!/bin/sh
+
+HERE="$(dirname "$(readlink -f "${0}")")"
+
+# Set paths
+export PATH="${HERE}/usr/bin":${PATH}
+
+# Make sure that XDG_CONFIG_HOME and XDG_DATA_HOME are set
+export XDG_CONFIG_HOME="${XDG_CONFIG_HOME:=$HOME/.config}"
+export XDG_DATA_HOME="${XDG_DATA_HOME:=$HOME/.local/share}"
+EOF
+# Add images if they exist
+[ -f /input/disk.qcow2 ] && printf 'OPTS="${OPTS} -hda ${HERE}/disk.qcow2"'  >> /AppDir/AppRun
+[ -f /input/floppy.img ] && printf 'OPTS="${OPTS} -fda ${HERE}/floppy.img"'  >> /AppDir/AppRun
+[ -f /input/cdrom.iso ]  && printf 'OPTS="${OPTS} -cdrom ${HERE}/cdrom.iso"' >> /AppDir/AppRun
+# Add executable and options
+cat <<- EOF >> /AppDir/AppRun
+
+	if [ "\${1}" ]; then
+		${executable} \${OPTS} ${QEMU_OPTS} "\${@}"
+	else
+		${executable} \${OPTS} ${QEMU_OPTS} -snapshot
+	fi
+EOF
+chmod a+x /AppDir/AppRun
+
 # Copy icon
-mkdir -p /AppDir/usr/share/icons/hicolor/scalable/apps/ && \
+mkdir -p /AppDir/usr/share/icons/hicolor/scalable/apps/
+if [ -f /input/icon.svg ]; then
+	cp -f /input/icon.svg /AppDir/usr/share/icons/hicolor/scalable/apps/qemu.svg
+else
 	wget -c -nv \
-	'https://gitlab.com/qemu-project/qemu/-/raw/f7da9c17c114417911ac2008d0401084a5030391/pc-bios/qemu_logo_no_text.svg' \
-	-O /AppDir/usr/share/icons/hicolor/scalable/apps/qemu.svg
+		'https://gitlab.com/qemu-project/qemu/-/raw/f7da9c17c114417911ac2008d0401084a5030391/pc-bios/qemu_logo_no_text.svg' \
+		-O /AppDir/usr/share/icons/hicolor/scalable/apps/qemu.svg
+fi
+
+# Copy binaries and images
+find /input -type f -iname '*.bin' -exec cp -vf {} /AppDir/ \;
+find /input -type f \( -iname '*.qcow2' -or -iname '*.img' -or -iname '*.iso' \) \
+	-exec cp -vf {} /AppDir/ \;
 
 # Download AppImage deploy
 wget -c -nv \

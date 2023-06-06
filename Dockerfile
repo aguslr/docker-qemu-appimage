@@ -24,7 +24,7 @@ WORKDIR /opt/qemu
 
 COPY entrypoint.sh /entrypoint.sh
 
-VOLUME /output
+VOLUME /input /output
 
 ENTRYPOINT ["/entrypoint.sh"]
 CMD ["--help"]
