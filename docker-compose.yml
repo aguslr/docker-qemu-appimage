@@ -1,0 +1,9 @@
+version: '2.4'
+
+services:
+  qemu-appimage:
+    container_name: qemu-appimage
+    build:
+      context: .
+    volumes:
+      - ./output:/output
