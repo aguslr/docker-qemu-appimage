@@ -122,15 +122,29 @@ ${executable} \${OPTS} ${QEMU_OPTS} "\${@}"
 EOF
 chmod a+x /AppDir/AppRun
 
-# Copy icon
+# Clean up existing icons
+rm -rf /AppDir/usr/share/icons/hicolor
+# Set App icon
 if [ -f /input/icon.svg ]; then
-	rm -rf /AppDir/usr/share/icons/hicolor
+	# Create icon directory
 	mkdir -p /AppDir/usr/share/icons/hicolor/scalable/apps/
+	# Copy SVG file to icon directory
 	cp -f /input/icon.svg /AppDir/usr/share/icons/hicolor/scalable/apps/qemu.svg
-	convert -gravity center -background none -size 512x512^ -extent 512x512^ \
+	# Generate PNG icon
+	convert -gravity center -background none -size 256x256^ -extent 256x256^ \
 		/AppDir/usr/share/icons/hicolor/scalable/apps/qemu.svg /AppDir/qemu.png
+elif [ -f /input/icon.png ]; then
+	# Get PNG icon size
+	icon_dir="$(identify -format "%wx%h" /input/icon.png)"
+	# Create icon directory
+	mkdir -p /AppDir/usr/share/icons/hicolor/"${icon_dir}"/apps/
+	# Copy PNG icons
+	cp -f /input/icon.png /AppDir/usr/share/icons/hicolor/"${icon_dir}"/apps/qemu.png
+	cp -f /input/icon.png /AppDir/qemu.png
 else
+	# Create icon directory
 	mkdir -p /AppDir/usr/share/icons/hicolor/scalable/apps/
+	# Download SVG file to icon directory
 	wget -c -nv \
 		'https://gitlab.com/qemu-project/qemu/-/raw/f7da9c17c114417911ac2008d0401084a5030391/pc-bios/qemu_logo_no_text.svg' \
 		-O /AppDir/usr/share/icons/hicolor/scalable/apps/qemu.svg
