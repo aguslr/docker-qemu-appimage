@@ -10,12 +10,11 @@ RUN \
   apt-get install -y wget imagemagick build-essential bison flex \
   libglib2.0-dev libfdt-dev libpixman-1-dev zlib1g-dev ninja-build valgrind \
   libaio-dev libbluetooth-dev libcapstone-dev libbrlapi-dev libbz2-dev \
-  libcap-ng-dev libcurl4-gnutls-dev libgtk-3-dev \
-  libibverbs-dev libjpeg-dev libncurses5-dev libnuma-dev \
-  librbd-dev librdmacm-dev \
-  libsasl2-dev libsdl2-dev libseccomp-dev libsnappy-dev libssh-dev \
-  libvde-dev libvdeplug-dev libvte-2.91-dev libxen-dev liblzo2-dev \
-  xfslibs-dev libnfs-dev libiscsi-dev libslirp-dev libvte-dev \
+  libcap-ng-dev libcurl4-gnutls-dev \
+  libibverbs-dev libjpeg-dev libnuma-dev \
+  libsasl2-dev libsdl2-dev libseccomp-dev libsnappy-dev \
+  libvde-dev libvdeplug-dev libxen-dev liblzo2-dev \
+  xfslibs-dev libnfs-dev libiscsi-dev libslirp-dev \
   libmount-dev libunistring-dev libp11-kit-dev libxkbcommon-dev \
   -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold" \
   && apt-get clean && rm -rf /var/lib/apt/lists/* /var/lib/apt/lists/*
