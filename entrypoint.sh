@@ -123,10 +123,14 @@ EOF
 chmod a+x /AppDir/AppRun
 
 # Copy icon
-mkdir -p /AppDir/usr/share/icons/hicolor/scalable/apps/
 if [ -f /input/icon.svg ]; then
+	rm -rf /AppDir/usr/share/icons/hicolor
+	mkdir -p /AppDir/usr/share/icons/hicolor/scalable/apps/
 	cp -f /input/icon.svg /AppDir/usr/share/icons/hicolor/scalable/apps/qemu.svg
+	convert -gravity center -background none -size 512x512^ -extent 512x512^ \
+		/AppDir/usr/share/icons/hicolor/scalable/apps/qemu.svg /AppDir/qemu.png
 else
+	mkdir -p /AppDir/usr/share/icons/hicolor/scalable/apps/
 	wget -c -nv \
 		'https://gitlab.com/qemu-project/qemu/-/raw/f7da9c17c114417911ac2008d0401084a5030391/pc-bios/qemu_logo_no_text.svg' \
 		-O /AppDir/usr/share/icons/hicolor/scalable/apps/qemu.svg

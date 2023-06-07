@@ -7,7 +7,7 @@ ENV QEMU_VER=8.0.2
 RUN \
   apt-get update && \
   env DEBIAN_FRONTEND=noninteractive \
-  apt-get install -y wget build-essential bison flex \
+  apt-get install -y wget imagemagick build-essential bison flex \
   libglib2.0-dev libfdt-dev libpixman-1-dev zlib1g-dev ninja-build valgrind \
   libaio-dev libbluetooth-dev libcapstone-dev libbrlapi-dev libbz2-dev \
   libcap-ng-dev libcurl4-gnutls-dev libgtk-3-dev \
