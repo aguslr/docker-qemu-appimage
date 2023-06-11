@@ -41,11 +41,22 @@ fi
 # Install QEMU and clean up
 make DESTDIR=/AppDir -j"$(nproc)" install && rm -rf /AppDir/var
 
+# Get executable
+case "${QEMU_OPTS%% *}" in
+	qemu-system*)
+		executable="${QEMU_OPTS%% *}"
+		QEMU_OPTS="${QEMU_OPTS#* }"
+		;;
+	*)
+		qemu_binary="$(find ./*-softmmu -name 'qemu-system-*' -print -quit)"
+		executable="$(basename "${qemu_binary}")"
+		;;
+esac
+
 # Copy QEMU binaries
-find ./*-softmmu -name 'qemu-system-*' -exec cp -vf {} /AppDir/usr/bin/ \;
+find ./*-softmmu -name "${executable}" -exec cp -vf {} /AppDir/usr/bin/ \;
 
 # Create desktop entry
-executable=$(basename /AppDir/usr/bin/qemu-system-*)
 mkdir -p /AppDir/usr/share/applications/ && \
 	cat <<- EOF > /AppDir/usr/share/applications/qemu.desktop
 	[Desktop Entry]
