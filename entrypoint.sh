@@ -9,6 +9,8 @@ export ARCH VERSION
 if [ ! -x ./configure ]; then
 	wget "https://download.qemu.org/qemu-${VERSION}.tar.xz" -O - \
 		| tar -xJv --strip-components=1 || exit
+elif [ -f ./VERSION ]; then
+	VERSION=$(cat ./VERSION)
 fi
 
 # Configure and build QEMU
