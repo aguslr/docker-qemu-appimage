@@ -22,6 +22,25 @@ to the `configure` script][2] before compiling QEMU:
 2. Find the generated AppImage in `./output`.
 
 
+### Variables
+
+The image is configured using environment variables passed at runtime:
+
+| Variable    | Function                    | Default | Required |
+| :---------- | :-------------------------- | :------ | -------- |
+| `APP_NAME`  | Name of the app to package  | `QEMU`  | N        |
+| `QEMU_VER`  | Version of QEMU to compile  | `8.0.2` | N        |
+| `QEMU_OPTS` | Custom QEMU runtime options | EMPTY   | N        |
+
+Here's an example to create an AppImage for a Pentium 3 machine with 64 MB of
+RAM:
+
+    docker run --rm -e 'APP_NAME=Pentium 3' -e 'QEMU_VER=7.2.1' \
+      -e 'QEMU_OPTS=qemu-system-i386 -cpu pentium 3 -m 64' \
+      -v ${PWD}/output:/output \
+      docker.io/aguslr/qemu-appimage:latest --target-list=i386-softmmu
+
+
 ### Disk images
 
 We can place disk images (QCOW2, ISO, raw images, etc.) in an `input` directory
@@ -37,6 +56,27 @@ These files will be read-only, therefore [changes to the disk][3] will be saved
 to a *QCOW2* image in a directory named after the AppImage inside
 `${XDG_DATA_HOME}/qemu.appimage`, unless we pass the `-snapshot` argument to the
 AppImage.
+
+
+### Examples
+
+Disable VNC support in QEMU and create an AppImage for a *Sun Solaris 9* disk
+image (located in `./input`):
+
+    docker run --rm -e 'APP_NAME=Solaris 9' \
+      -e 'QEMU_OPTS=qemu-system-sparc -M SS-5 -m 256 -vga cg3 -g 1024x768' \
+      -v ${PWD}/input:/input -v ${PWD}/output:/output \
+      docker.io/aguslr/qemu-appimage:latest \
+      --target-list=sparc-softmmu --disable-vnc
+
+Disable *PulseAudio* and *SLiRP* support in QEMU and create an AppImage for a
+*Mac OS 9* disk image (located in `./input`):
+
+    docker run --rm -e 'APP_NAME=Mac OS 9' \
+      -e 'QEMU_OPTS=qemu-system-ppc -machine mac99 -m 256 -nic none -g 1024x768x32' \
+      -v ${PWD}/input:/input -v ${PWD}/output:/output \
+      docker.io/aguslr/qemu-appimage:latest \
+      --target-list=ppc-softmmu --disable-pa --disable-slirp
 
 
 Build locally
