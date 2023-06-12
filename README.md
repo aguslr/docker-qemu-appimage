@@ -60,23 +60,37 @@ AppImage.
 
 ### Examples
 
-Disable VNC support in QEMU and create an AppImage for a *Sun Solaris 9* disk
-image (located in `./input`):
+- Disable VNC support in QEMU and create an AppImage for a *Sun Solaris 9* disk
+   image (located in `./input`):
 
-    docker run --rm -e 'APP_NAME=Solaris 9' \
-      -e 'QEMU_OPTS=qemu-system-sparc -M SS-5 -m 256 -vga cg3 -g 1024x768' \
-      -v ${PWD}/input:/input -v ${PWD}/output:/output \
-      docker.io/aguslr/qemu-appimage:latest \
-      --target-list=sparc-softmmu --disable-vnc
+       docker run --rm -e 'APP_NAME=Solaris 9' \
+         -e 'QEMU_OPTS=qemu-system-sparc -M SS-5 -m 256 -vga cg3 -g 1024x768' \
+         -v ${PWD}/input:/input -v ${PWD}/output:/output \
+         docker.io/aguslr/qemu-appimage:latest \
+         --target-list=sparc-softmmu --disable-vnc && \
+         ./output/Solaris_9-8.0.2-x86_64.AppImage -snapshot -monitor stdio
 
-Disable *PulseAudio* and *SLiRP* support in QEMU and create an AppImage for a
-*Mac OS 9* disk image (located in `./input`):
+<picture>
+  <source media="(prefers-color-scheme: light)" srcset="https://github.com/aguslr/docker-qemu-appimage/raw/main/screenshots/solaris9-light.png">
+  <source media="(prefers-color-scheme: dark)"  srcset="https://github.com/aguslr/docker-qemu-appimage/raw/main/screenshots/solaris9-dark.png">
+  <img title="Solaris 9" alt="solaris9" src="https://github.com/aguslr/docker-qemu-appimage/raw/main/screenshots/solaris9-light.png">
+</picture>
 
-    docker run --rm -e 'APP_NAME=Mac OS 9' \
-      -e 'QEMU_OPTS=qemu-system-ppc -machine mac99 -m 256 -nic none -g 1024x768x32' \
-      -v ${PWD}/input:/input -v ${PWD}/output:/output \
-      docker.io/aguslr/qemu-appimage:latest \
-      --target-list=ppc-softmmu --disable-pa --disable-slirp
+- Disable *PulseAudio* and *SLiRP* support in QEMU and create an AppImage for a
+  *Mac OS 9* disk image (located in `./input`):
+
+       docker run --rm -e 'APP_NAME=Mac OS 9.2' \
+         -e 'QEMU_OPTS=qemu-system-ppc -machine mac99 -m 256 -nic none -g 1024x768x32' \
+         -v ${PWD}/input:/input -v ${PWD}/output:/output \
+         docker.io/aguslr/qemu-appimage:latest \
+         --target-list=ppc-softmmu --disable-pa --disable-slirp && \
+         ./output/Mac_OS_9.2-8.0.2-x86_64.AppImage -snapshot -vnc :0
+
+<picture>
+  <source media="(prefers-color-scheme: light)" srcset="https://github.com/aguslr/docker-qemu-appimage/raw/main/screenshots/macos9-light.png">
+  <source media="(prefers-color-scheme: dark)"  srcset="https://github.com/aguslr/docker-qemu-appimage/raw/main/screenshots/macos9-dark.png">
+  <img title="Mac OS 9.2" alt="macos9" src="https://github.com/aguslr/docker-qemu-appimage/raw/main/screenshots/macos9-light.png">
+</picture>
 
 
 Build locally
