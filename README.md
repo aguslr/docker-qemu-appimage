@@ -108,6 +108,20 @@ Instead of pulling the image from a remote repository, you can build it locally:
        cd docker-qemu-appimage && docker-compose up --build -d
 
 
+References
+----------
+
+- [qemu-ppc/.travis.yml at master · probonopd/qemu-ppc · GitHub][4]
+- [qemu-img Backing Files: A Poor Man's Snapshot/Rollback - A Random Walk Down
+  Tech Street][3]
+- [14.9. Rebasing a Backing File of an Image Red Hat Enterprise Linux 7 | Red
+  Hat Customer Portal][5]
+- [QEMU disk image utility — QEMU documentation][6]
+
+
 [1]: https://github.com/aguslr/docker-qemu-appimage
 [2]: https://github.com/qemu/qemu/blob/45ae97993a75f975f1a01d25564724c7e10a543f/configure#L831
 [3]: http://web.archive.org/web/http://dustymabe.com/2015/01/11/qemu-img-backing-files-a-poor-mans-snapshotrollback/
+[4]: https://github.com/probonopd/qemu-ppc/blob/master/.travis.yml
+[5]: https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/7/html/virtualization_deployment_and_administration_guide/sect-using_qemu_img-re_basing_a_backing_file_of_an_image
+[6]: https://qemu.readthedocs.io/en/latest/tools/qemu-img.html
