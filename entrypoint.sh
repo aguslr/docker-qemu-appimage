@@ -190,7 +190,7 @@ configAppDir() {
 # Configure AppDir
 if [ "${executable}" ]; then
 		# Set name
-		NAME="${APP_NAME:-QEMU}"
+		NAME="${APP_NAME:-$executable}"
 		# Run function
 		configAppDir "${executable}"
 else
@@ -199,7 +199,7 @@ else
 		# Set executable
 		executable="$(basename "${file}")"
 		# Set name
-		NAME="${APP_NAME:-QEMU} (${executable##*-})"
+		NAME="${APP_NAME:-$executable}"
 		# Run function
 		configAppDir "${executable}"
 	done

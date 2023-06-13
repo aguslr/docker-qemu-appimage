@@ -26,11 +26,11 @@ to the `configure` script][2] before compiling QEMU:
 
 The image is configured using environment variables passed at runtime:
 
-| Variable    | Function                    | Default | Required |
-| :---------- | :-------------------------- | :------ | -------- |
-| `APP_NAME`  | Name of the app to package  | `QEMU`  | N        |
-| `QEMU_VER`  | Version of QEMU to compile  | `8.0.2` | N        |
-| `QEMU_OPTS` | Custom QEMU runtime options | EMPTY   | N        |
+| Variable    | Function                    | Default         | Required |
+| :---------- | :-------------------------- | :-------------- | -------- |
+| `APP_NAME`  | Name of the app to package  | `qemu-system-*` | N        |
+| `QEMU_VER`  | Version of QEMU to compile  | `8.0.2`         | N        |
+| `QEMU_OPTS` | Custom QEMU runtime options | EMPTY           | N        |
 
 Here's an example to create an AppImage for a Pentium 3 machine with 64 MB of
 RAM:
