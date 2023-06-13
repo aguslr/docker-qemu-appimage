@@ -19,19 +19,8 @@ if [ ! -d ./build ]; then
 		../configure \
 		--prefix=/usr \
 		--enable-strip \
-		--enable-sdl \
 		--enable-system \
 		--disable-user \
-		--disable-gtk \
-		--disable-gnutls \
-		--disable-vte \
-		--disable-libssh \
-		--disable-smartcard \
-		--disable-curses \
-		--disable-gcrypt \
-		--disable-rdma \
-		--disable-tpm \
-		--disable-rbd \
 		--disable-debug-info \
 		--disable-werror \
 		"$@" || exit
