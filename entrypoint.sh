@@ -69,11 +69,6 @@ mkdir -p /AppDir/usr/share/applications/ && \
 	Type=Application
 	Icon=qemu
 	Categories=System;Emulator;
-	Actions=ReadOnly;
-
-	[Desktop Action ReadOnly]
-	Name=New Window with a temporary disk
-	Exec=${executable} -snapshot
 	EOF
 
 # Create AppRun script
