@@ -40,138 +40,167 @@ else
 	cd ./build || exit
 fi
 
-# Install QEMU and clean up
-make DESTDIR=/AppDir -j"$(nproc)" install && rm -rf /AppDir/var
+# Download AppImage deploy
+wget -c -nv \
+	"https://github.com/probonopd/linuxdeployqt/releases/download/continuous/linuxdeployqt-continuous-${ARCH}.AppImage" \
+	-O /usr/local/bin/linuxdeployqt.appimage && \
+	chmod a+x /usr/local/bin/linuxdeployqt.appimage
 
-# Get executable
+# Extract AppImage deploy
+(cd /opt && /usr/local/bin/linuxdeployqt.appimage --appimage-extract)
+
+# Get QEMU binaries
 case "${QEMU_OPTS%% *}" in
 	qemu-system*)
 		executable="${QEMU_OPTS%% *}"
 		QEMU_OPTS="${QEMU_OPTS#* }"
 		;;
-	*)
-		qemu_binary="$(find ./*-softmmu -name 'qemu-system-*' -print -quit)"
-		executable="$(basename "${qemu_binary}")"
-		;;
 esac
 
-# Copy QEMU binaries
-find ./*-softmmu -name "${executable}" -exec cp -vf {} /AppDir/usr/bin/ \;
+# Function to config AppDir and generate AppImage
+configAppDir() {
 
-# Create desktop entry
-mkdir -p /AppDir/usr/share/applications/ && \
-	cat <<- EOF > /AppDir/usr/share/applications/qemu.desktop
-	[Desktop Entry]
-	Name=${APP_NAME:-QEMU}
-	Comment=Emulator
-	Exec=${executable}
-	Terminal=false
-	Type=Application
-	Icon=qemu
-	Categories=System;Emulator;
+	# Cleanup AppDir
+	mkdir -p /AppDir && (cd /AppDir && rm -rf -- ./* ./.??*)
+
+	# Get executable
+	executable="${1}"
+
+	# Install QEMU and clean up
+	make DESTDIR=/AppDir -j"$(nproc)" install && rm -rf /AppDir/var
+
+	# Copy QEMU binary
+	find ./*-softmmu -name "${executable}" -exec cp -vf {} /AppDir/usr/bin/ \;
+
+	# Create desktop entry
+	mkdir -p /AppDir/usr/share/applications/ && \
+		cat <<- EOF > /AppDir/usr/share/applications/qemu.desktop
+		[Desktop Entry]
+		Name=${NAME}
+		Comment=Emulator
+		Exec=${executable}
+		Terminal=false
+		Type=Application
+		Icon=qemu
+		Categories=System;Emulator;
+		EOF
+
+	# Create AppRun script
+	cat << '	EOF' | sed -r 's/^\t//' > /AppDir/AppRun
+	#!/bin/sh
+
+	# Set environment
+	HERE="$(dirname "$(readlink -f "${0}")")"
+	APPIMAGE=$(basename "$ARGV0")
+	APPIMAGE_NAME="${APPIMAGE%.*}"
+
+	# Set paths
+	PATH="${HERE}/usr/bin":${PATH}
+	LD_LIBRARY_PATH="${HERE}/usr/lib":${LD_LIBRARY_PATH}
+	export PATH LD_LIBRARY_PATH
+
+	# Make sure that XDG_CONFIG_HOME and XDG_DATA_HOME are set
+	export XDG_CONFIG_HOME="${XDG_CONFIG_HOME:=$HOME/.config}"
+	export XDG_DATA_HOME="${XDG_DATA_HOME:=$HOME/.local/share}"
+
+	# Check arguments
+	for ARG in "${@}"; do
+		[ "${ARG}" = '-snapshot' ] && SNAPSHOT=1
+	done
+
+	# Create file for disk image
+	if [ -f "${HERE}/disk.qcow2" ]; then
+		# Check for disk image
+		if [ -f "${QEMU_DATA}/disk.qcow2" ]; then
+			# Create directory structure
+			QEMU_DATA="${XDG_DATA_HOME}/qemu.appimage/${APPIMAGE_NAME:-QEMU}" && \
+				mkdir -p "${QEMU_DATA}"
+			# Rebase backing file
+			qemu-img rebase -f qcow2 -u -b "${HERE}/disk.qcow2" -F qcow2 \
+				"${QEMU_DATA}/disk.qcow2" \
+				&& OPTS="${OPTS} -hda ${QEMU_DATA}/disk.qcow2" \
+				|| OPTS="${OPTS} -hda ${HERE}/disk.qcow2"
+		elif [ ! "${SNAPSHOT}" ]; then
+			# Create directory structure
+			QEMU_DATA="${XDG_DATA_HOME}/qemu.appimage/${APPIMAGE_NAME:-QEMU}" && \
+				mkdir -p "${QEMU_DATA}"
+			# Create disk image
+			qemu-img create -f qcow2 -b "${HERE}/disk.qcow2" -F qcow2 \
+				"${QEMU_DATA}/disk.qcow2" \
+				&& OPTS="${OPTS} -hda ${QEMU_DATA}/disk.qcow2" \
+				|| OPTS="${OPTS} -hda ${HERE}/disk.qcow2"
+		else
+			OPTS="${OPTS} -hda ${HERE}/disk.qcow2"
+		fi
+	fi
+
+	# Add options for other images
+	[ -f "${HERE}/floppy.img" ] && OPTS="${OPTS} -fda ${HERE}/floppy.img"
+	[ -f "${HERE}/cdrom.iso" ]  && OPTS="${OPTS} -cdrom ${HERE}/cdrom.iso"
+
 	EOF
 
-# Create AppRun script
-cat << 'EOF' > /AppDir/AppRun
-#!/bin/sh
+	# Add executable and options
+	cat <<- EOF >> /AppDir/AppRun
+	# Run QEMU
+	${executable} \${OPTS} ${QEMU_OPTS} "\${@}"
+	EOF
+	chmod a+x /AppDir/AppRun
 
-# Set environment
-HERE="$(dirname "$(readlink -f "${0}")")"
-APPIMAGE=$(basename "$ARGV0")
-APPIMAGE_NAME="${APPIMAGE%.*}"
-
-# Set paths
-PATH="${HERE}/usr/bin":${PATH}
-LD_LIBRARY_PATH="${HERE}/usr/lib":${LD_LIBRARY_PATH}
-export PATH LD_LIBRARY_PATH
-
-# Make sure that XDG_CONFIG_HOME and XDG_DATA_HOME are set
-export XDG_CONFIG_HOME="${XDG_CONFIG_HOME:=$HOME/.config}"
-export XDG_DATA_HOME="${XDG_DATA_HOME:=$HOME/.local/share}"
-
-# Check arguments
-for ARG in "${@}"; do
-	[ "${ARG}" = '-snapshot' ] && SNAPSHOT=1
-done
-
-# Create file for disk image
-if [ -f "${HERE}/disk.qcow2" ]; then
-	# Check for disk image
-	if [ -f "${QEMU_DATA}/disk.qcow2" ]; then
-		# Create directory structure
-		QEMU_DATA="${XDG_DATA_HOME}/qemu.appimage/${APPIMAGE_NAME:-QEMU}" && \
-			mkdir -p "${QEMU_DATA}"
-		# Rebase backing file
-		qemu-img rebase -f qcow2 -u -b "${HERE}/disk.qcow2" -F qcow2 \
-			"${QEMU_DATA}/disk.qcow2" \
-			&& OPTS="${OPTS} -hda ${QEMU_DATA}/disk.qcow2" \
-			|| OPTS="${OPTS} -hda ${HERE}/disk.qcow2"
-	elif [ ! "${SNAPSHOT}" ]; then
-		# Create directory structure
-		QEMU_DATA="${XDG_DATA_HOME}/qemu.appimage/${APPIMAGE_NAME:-QEMU}" && \
-			mkdir -p "${QEMU_DATA}"
-		# Create disk image
-		qemu-img create -f qcow2 -b "${HERE}/disk.qcow2" -F qcow2 \
-			"${QEMU_DATA}/disk.qcow2" \
-			&& OPTS="${OPTS} -hda ${QEMU_DATA}/disk.qcow2" \
-			|| OPTS="${OPTS} -hda ${HERE}/disk.qcow2"
-	else
-		OPTS="${OPTS} -hda ${HERE}/disk.qcow2"
+	# Set App icon
+	if [ -f /input/icon.svg ]; then
+		# Clean up existing icons
+		rm -rf /AppDir/usr/share/icons/hicolor
+		# Create icon directory
+		mkdir -p /AppDir/usr/share/icons/hicolor/scalable/apps/
+		# Copy SVG file to icon directory
+		cp -f /input/icon.svg /AppDir/usr/share/icons/hicolor/scalable/apps/qemu.svg
+		# Generate PNG icon
+		convert -gravity center -background none -size 256x256^ -extent 256x256^ \
+			/AppDir/usr/share/icons/hicolor/scalable/apps/qemu.svg /AppDir/qemu.png
+	elif [ -f /input/icon.png ]; then
+		# Get PNG icon size
+		icon_dir="$(identify -format "%wx%h" /input/icon.png)"
+		# Clean up existing icons
+		rm -rf /AppDir/usr/share/icons/hicolor
+		# Create icon directory
+		mkdir -p /AppDir/usr/share/icons/hicolor/"${icon_dir}"/apps/
+		# Copy PNG icons
+		cp -f /input/icon.png /AppDir/usr/share/icons/hicolor/"${icon_dir}"/apps/qemu.png
+		cp -f /input/icon.png /AppDir/qemu.png
 	fi
+
+	# Copy binaries and images
+	find /input -type f -iname '*.bin' -exec cp -vf {} /AppDir/ \;
+	find /input -type f \( -iname '*.qcow2' -or -iname '*.img' -or -iname '*.iso' \) \
+		-exec cp -vf {} /AppDir/ \;
+
+	# Create AppImage
+	unset QTDIR QT_PLUGIN_PATH LD_LIBRARY_PATH
+	(
+		cd /opt && \
+			./squashfs-root/AppRun /AppDir/usr/share/applications/*.desktop -bundle-non-qt-libs && \
+			./squashfs-root/AppRun /AppDir/usr/share/applications/*.desktop -appimage && \
+			find /AppDir -executable -type f -exec ldd {} \; | grep " => /usr" | cut -d " " -f 2-3 | sort | uniq
+		mv -vf ./*.AppImage /output
+	)
+
+}
+
+# Configure AppDir
+if [ "${executable}" ]; then
+		# Set name
+		NAME="${APP_NAME:-QEMU}"
+		# Run function
+		configAppDir "${executable}"
+else
+	find ./*-softmmu -name 'qemu-system-*' -print \
+		| while IFS= read -r file; do
+		# Set executable
+		executable="$(basename "${file}")"
+		# Set name
+		NAME="${APP_NAME:-QEMU} (${executable##*-})"
+		# Run function
+		configAppDir "${executable}"
+	done
 fi
-
-# Add options for other images
-[ -f "${HERE}/floppy.img" ] && OPTS="${OPTS} -fda ${HERE}/floppy.img"
-[ -f "${HERE}/cdrom.iso" ]  && OPTS="${OPTS} -cdrom ${HERE}/cdrom.iso"
-
-EOF
-# Add executable and options
-cat << EOF >> /AppDir/AppRun
-# Run QEMU
-${executable} \${OPTS} ${QEMU_OPTS} "\${@}"
-EOF
-chmod a+x /AppDir/AppRun
-
-# Set App icon
-if [ -f /input/icon.svg ]; then
-	# Clean up existing icons
-	rm -rf /AppDir/usr/share/icons/hicolor
-	# Create icon directory
-	mkdir -p /AppDir/usr/share/icons/hicolor/scalable/apps/
-	# Copy SVG file to icon directory
-	cp -f /input/icon.svg /AppDir/usr/share/icons/hicolor/scalable/apps/qemu.svg
-	# Generate PNG icon
-	convert -gravity center -background none -size 256x256^ -extent 256x256^ \
-		/AppDir/usr/share/icons/hicolor/scalable/apps/qemu.svg /AppDir/qemu.png
-elif [ -f /input/icon.png ]; then
-	# Get PNG icon size
-	icon_dir="$(identify -format "%wx%h" /input/icon.png)"
-	# Clean up existing icons
-	rm -rf /AppDir/usr/share/icons/hicolor
-	# Create icon directory
-	mkdir -p /AppDir/usr/share/icons/hicolor/"${icon_dir}"/apps/
-	# Copy PNG icons
-	cp -f /input/icon.png /AppDir/usr/share/icons/hicolor/"${icon_dir}"/apps/qemu.png
-	cp -f /input/icon.png /AppDir/qemu.png
-fi
-
-# Copy binaries and images
-find /input -type f -iname '*.bin' -exec cp -vf {} /AppDir/ \;
-find /input -type f \( -iname '*.qcow2' -or -iname '*.img' -or -iname '*.iso' \) \
-	-exec cp -vf {} /AppDir/ \;
-
-# Download AppImage deploy
-wget -c -nv \
-	"https://github.com/probonopd/linuxdeployqt/releases/download/continuous/linuxdeployqt-continuous-${ARCH}.AppImage" \
-	-O ./linuxdeployqt.appimage && \
-	chmod a+x linuxdeployqt.appimage
-
-# Extract AppImage
-unset QTDIR QT_PLUGIN_PATH LD_LIBRARY_PATH
-./linuxdeployqt.appimage --appimage-extract && \
-	./squashfs-root/AppRun /AppDir/usr/share/applications/*.desktop -bundle-non-qt-libs && \
-	./squashfs-root/AppRun /AppDir/usr/share/applications/*.desktop -appimage && \
-	find /AppDir -executable -type f -exec ldd {} \; | grep " => /usr" | cut -d " " -f 2-3 | sort | uniq
-
-# Move generated AppImages
-mv -vf ./*.AppImage /output

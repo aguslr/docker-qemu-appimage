@@ -19,7 +19,7 @@ to the `configure` script][2] before compiling QEMU:
          -v "${PWD}"/input:/input -v "${PWD}"/output:/output \
          docker.io/aguslr/qemu-appimage:latest --target-list=i386-softmmu
 
-2. Find the generated AppImage in `./output`.
+2. Find the generated AppImages in `./output`.
 
 
 ### Variables
