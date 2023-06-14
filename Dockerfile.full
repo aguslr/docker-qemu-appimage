@@ -7,9 +7,10 @@ ENV QEMU_VER=8.0.2
 RUN \
   apt-get update && \
   env DEBIAN_FRONTEND=noninteractive \
+  apt-get install -y \
+  wget imagemagick file build-essential && \
   apt-get install -y --no-install-recommends \
-  wget ca-certificates file imagemagick \
-  build-essential bison flex ninja-build valgrind \
+  bison flex ninja-build valgrind \
   libaio-dev \
   libbluetooth-dev \
   libbpf-dev \
