@@ -63,6 +63,16 @@ jobs:
 
     runs-on: ubuntu-latest
 
+    strategy:
+      fail-fast: false
+      matrix:
+        custom_tag: [slim, full]
+        include:
+          - custom_tag: slim
+            is_latest: false
+          - custom_tag: full
+            is_latest: true
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
@@ -87,11 +97,20 @@ jobs:
           labels: |
             org.opencontainers.image.base.name=docker.io/${{ env.IMAGE_BASE }}
           tags: |
-            type=sha
-            type=schedule,pattern={{date 'YYYYMMDD'}}
-            type=semver,pattern={{version}}
-            type=semver,pattern={{major}}.{{minor}}
-            type=raw,value=latest,enable={{is_default_branch}}
+            type=raw,value=${{ matrix.custom_tag }}
+
+      - name: Extract Docker latest tag
+        if: |
+          github.event_name != 'pull_request' && matrix.is_latest == true
+        id: meta_latest
+        uses: docker/metadata-action@v4
+        with:
+          images: |
+            docker.io/${{ env.DOCKER_USERNAME }}/${{ env.IMAGE_NAME }}
+          flavor: |
+            latest=false
+          tags: |
+            type=raw,value=latest
 
       - name: Extract Docker PR tag
         if: github.event_name == 'pull_request'
@@ -102,21 +121,23 @@ jobs:
             docker.io/${{ env.DOCKER_USERNAME }}/${{ env.IMAGE_NAME }}
           flavor: |
             latest=false
-          labels: |
-            org.opencontainers.image.base.name=docker.io/${{ env.IMAGE_BASE }}
           tags: |
-            type=sha
-            type=ref,event=pr
+            type=ref,suffix=-${{ matrix.custom_tag }},event=pr
 
       - name: Build and push Docker image
         id: build-and-push
         uses: docker/build-push-action@v3
         with:
           context: .
+          file: |
+            ./Dockerfile.${{ matrix.custom_tag }}
           build-args: |
             BASE_IMAGE=${{ env.IMAGE_BASE }}
           push: ${{ github.event_name != 'pull_request' }}
-          tags: ${{ steps.meta.outputs.tags }}
+          tags: |
+            ${{ steps.meta.outputs.tags }}
+            ${{ steps.meta_latest.outputs.tags }}
+            ${{ steps.meta_pr.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
 
       - name: Update repo description

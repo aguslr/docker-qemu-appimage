@@ -1,0 +1,30 @@
+ARG BASE_IMAGE=library/ubuntu:focal
+
+FROM docker.io/${BASE_IMAGE}
+
+ENV QEMU_VER=8.0.2
+
+RUN \
+  apt-get update && \
+  env DEBIAN_FRONTEND=noninteractive \
+  apt-get install -y --no-install-recommends \
+  wget ca-certificates file imagemagick \
+  build-essential bison flex ninja-build valgrind \
+  libcap-ng-dev \
+  libpixman-1-dev \
+  libpmem-dev \
+  libpulse-dev \
+  libsdl2-dev libsdl2-image-dev \
+  libslirp-dev \
+  libspice-server-dev \
+  libvncserver-dev \
+  -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold" \
+  && apt-get clean && rm -rf /var/lib/apt/lists/* /var/lib/apt/lists/*
+
+WORKDIR /opt/qemu
+
+COPY entrypoint.sh /entrypoint.sh
+
+VOLUME /opt/qemu /input /output
+
+ENTRYPOINT ["/entrypoint.sh"]

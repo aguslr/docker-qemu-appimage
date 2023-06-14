@@ -22,6 +22,18 @@ to the `configure` script][2] before compiling QEMU:
 2. Find the generated AppImages in `./output`.
 
 
+### Tags
+
+There are two flavors for this docker container:
+
+- `full` or `latest`: Provides libraries to enable most QEMU features. To
+  disable any unwanted feature, arguments (e.g. `--disable-gtk`) must be passed
+  to the container image.
+
+- `slim`: Provides basic QEMU functionality (e.g. graphics, audio, networking,
+  [remote viewing via *SPICE*/*VNC*][7], etc.).
+
+
 ### Variables
 
 The image is configured using environment variables passed at runtime:
@@ -125,3 +137,4 @@ References
 [4]: https://github.com/probonopd/qemu-ppc/blob/master/.travis.yml
 [5]: https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/7/html/virtualization_deployment_and_administration_guide/sect-using_qemu_img-re_basing_a_backing_file_of_an_image
 [6]: https://qemu.readthedocs.io/en/latest/tools/qemu-img.html
+[7]: https://access.redhat.com/documentation/es-es/red_hat_enterprise_linux/7/html/virtualization_deployment_and_administration_guide/sect-graphic_user_interface_tools_for_guest_virtual_machine_management-remote_viewer
