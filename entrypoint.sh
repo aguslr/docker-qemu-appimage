@@ -132,7 +132,7 @@ configAppDir() {
 	# Add executable and options
 	cat <<- EOF >> /AppDir/AppRun
 	# Run QEMU
-	${executable} \${OPTS} ${QEMU_OPTS} "\${@}"
+	${executable} ${QEMU_OPTS} \${OPTS} "\${@}"
 	EOF
 	chmod a+x /AppDir/AppRun
 
