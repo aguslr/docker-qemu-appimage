@@ -58,11 +58,11 @@ RAM:
 We can place disk images (QCOW2, ISO, raw images, etc.) in an `input` directory
 and they will be copied and loaded at runtime:
 
-| Filename     | Function    | Device   |
-| :----------- | :---------- | :------- |
-| `disk.qcow2` | Hard drive  | `-hda`   |
-| `cdrom.iso`  | CD-ROM      | `-cdrom` |
-| `floppy.img` | Floppy disk | `-fda`   |
+| Filename    | Function    | Device   |
+| :---------- | :---------- | :------- |
+| `fda.img`   | Floppy disk | `-fda`   |
+| `cdrom.iso` | CD-ROM      | `-cdrom` |
+| `hda.qcow2` | Hard drive  | `-hda`   |
 
 These files will be read-only, therefore [changes to the disk][3] will be saved
 to a *QCOW2* image in a directory named after the AppImage inside
@@ -73,7 +73,7 @@ AppImage.
 ### Examples
 
 - Disable VNC support in QEMU and create an AppImage for a *Sun Solaris 9* disk
-  (located in `./input`):
+  (`./input/hda.qcow2`):
 
        docker run --rm -e 'APP_NAME=Solaris 9' \
          -e 'QEMU_OPTS=qemu-system-sparc -M SS-5 -m 256 -vga cg3 -g 1024x768' \
@@ -89,7 +89,7 @@ AppImage.
 </picture>
 
 - Disable *PulseAudio* and *SLiRP* support in QEMU and create an AppImage for a
-  *Mac OS 9* disk (located in `./input`):
+  *Mac OS 9* disk (`./input/hda.qcow2`):
 
        docker run --rm -e 'APP_NAME=Mac OS 9.2' \
          -e 'QEMU_OPTS=qemu-system-ppc -machine mac99 -m 256 -nic none -g 1024x768x32' \

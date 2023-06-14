@@ -93,40 +93,55 @@ configAppDir() {
 	XDG_DATA_HOME="${XDG_DATA_HOME:=$HOME/.local/share}"
 	export XDG_CONFIG_HOME XDG_DATA_HOME
 
+	# Set data directory
+	QEMU_DATA="${XDG_DATA_HOME}/qemu.appimage/${APPIMAGE_NAME:-QEMU}"
+
 	# Check arguments
 	for ARG in "${@}"; do
 		[ "${ARG}" = '-snapshot' ] && SNAPSHOT=1
 	done
 
-	# Create file for disk image
-	if [ -f "${HERE}/disk.qcow2" ]; then
-		# Check for disk image
-		if [ -f "${QEMU_DATA}/disk.qcow2" ]; then
-			# Create directory structure
-			QEMU_DATA="${XDG_DATA_HOME}/qemu.appimage/${APPIMAGE_NAME:-QEMU}" && \
-				mkdir -p "${QEMU_DATA}"
+	# Create backing files for disk images
+	for disk in "${HERE}"/hd?.qcow2; do
+		# Check file exists
+		[ -f "${disk}" ] || continue
+		# Get filename
+		diskname="$(basename "${disk}")"
+		# Get devicename
+		device="${diskname%.*}"
+		# Check for backing file
+		if [ -f "${QEMU_DATA}/${diskname}" ]; then
 			# Rebase backing file
-			qemu-img rebase -f qcow2 -u -b "${HERE}/disk.qcow2" -F qcow2 \
-				"${QEMU_DATA}/disk.qcow2" \
-				&& OPTS="${OPTS} -hda ${QEMU_DATA}/disk.qcow2" \
-				|| OPTS="${OPTS} -hda ${HERE}/disk.qcow2"
+			qemu-img rebase -f qcow2 -u -b "${disk}" -F qcow2 \
+				"${QEMU_DATA}/${diskname}" \
+				&& OPTS="${OPTS} -${device} ${QEMU_DATA}/${diskname}" \
+				|| OPTS="${OPTS} -${device} ${disk}"
 		elif [ ! "${SNAPSHOT}" ]; then
-			# Create directory structure
-			QEMU_DATA="${XDG_DATA_HOME}/qemu.appimage/${APPIMAGE_NAME:-QEMU}" && \
-				mkdir -p "${QEMU_DATA}"
+			# Create data directory
+			mkdir -p "${QEMU_DATA}"
 			# Create disk image
-			qemu-img create -f qcow2 -b "${HERE}/disk.qcow2" -F qcow2 \
-				"${QEMU_DATA}/disk.qcow2" \
-				&& OPTS="${OPTS} -hda ${QEMU_DATA}/disk.qcow2" \
-				|| OPTS="${OPTS} -hda ${HERE}/disk.qcow2"
+			qemu-img create -f qcow2 -b "${disk}" -F qcow2 \
+				"${QEMU_DATA}/${diskname}" \
+				&& OPTS="${OPTS} -${device} ${QEMU_DATA}/${diskname}" \
+				|| OPTS="${OPTS} -${device} ${disk}"
 		else
-			OPTS="${OPTS} -hda ${HERE}/disk.qcow2"
+			OPTS="${OPTS} -${device} ${disk}"
 		fi
-	fi
+	done
 
-	# Add options for other images
-	[ -f "${HERE}/floppy.img" ] && OPTS="${OPTS} -fda ${HERE}/floppy.img"
-	[ -f "${HERE}/cdrom.iso" ]  && OPTS="${OPTS} -cdrom ${HERE}/cdrom.iso"
+	# Add options for other floppy images
+	for floppy in "${HERE}"/fd?.img; do
+		# Check file exists
+		[ -f "${floppy}" ] || continue
+		# Get filename
+		floppyname="$(basename "${floppy}")"
+		# Get devicename
+		device="${floppyname%.*}"
+		OPTS="${OPTS} -${device} ${floppy}"
+	done
+
+	# Add options for CD image
+	[ -f "${HERE}/cdrom.iso" ] && OPTS="${OPTS} -cdrom ${HERE}/cdrom.iso"
 
 	EOF
 
