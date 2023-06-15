@@ -36,7 +36,11 @@ wget -c -nv \
 	chmod a+x /usr/local/bin/linuxdeployqt.appimage
 
 # Extract AppImage deploy
-(cd /opt && /usr/local/bin/linuxdeployqt.appimage --appimage-extract)
+mkdir -p /opt/linuxdeploy || exit
+(
+	cd /opt/linuxdeploy && \
+		/usr/local/bin/linuxdeployqt.appimage --appimage-extract
+)
 
 # Get QEMU binaries
 case "${QEMU_OPTS%% *}" in
@@ -183,7 +187,7 @@ makeAppImage() {
 	# Create AppImage
 	unset QTDIR QT_PLUGIN_PATH LD_LIBRARY_PATH
 	(
-		cd /opt && \
+		cd /opt/linuxdeploy && \
 			./squashfs-root/AppRun /AppDir/usr/share/applications/*.desktop -bundle-non-qt-libs && \
 			./squashfs-root/AppRun /AppDir/usr/share/applications/*.desktop -appimage && \
 			find /AppDir -executable -type f -exec ldd {} \; | grep " => /usr" | cut -d " " -f 2-3 | sort | uniq
