@@ -31,7 +31,7 @@ There are two flavors for this docker container:
   to the container image.
 
 - `slim`: Provides basic QEMU functionality (e.g. graphics, audio, networking,
-  [remote viewing via *SPICE*/*VNC*][7], etc.).
+  USB, [remote viewing via *SPICE*/*VNC*][7], etc.).
 
 
 ### Variables
