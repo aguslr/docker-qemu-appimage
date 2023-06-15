@@ -19,9 +19,21 @@ env:
 
 jobs:
 
+  variables:
+    runs-on: ubuntu-latest
+    outputs:
+      image_name: ${{ steps.split.outputs.image_name }}
+    steps:
+      - name: Set name of image
+        id: split
+        run: echo "image_name=${REPO_NAME#*-}" >> $GITHUB_OUTPUT
+
   update:
 
+    needs: variables
     runs-on: ubuntu-latest
+    env:
+      IMAGE_NAME: ${{ needs.variables.outputs.image_name }}
 
     steps:
       - name: Checkout repository
