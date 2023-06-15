@@ -15,7 +15,8 @@ fi
 
 # Configure and build QEMU
 if [ ! -d ./build ]; then
-	mkdir build && cd build && \
+	mkdir ./build || exit
+	cd ./build && \
 		../configure \
 		--prefix=/usr \
 		--enable-strip \
@@ -24,7 +25,7 @@ if [ ! -d ./build ]; then
 		--disable-debug-info \
 		--disable-werror \
 		"$@" || exit
-	make -j"$(nproc)"
+	make -j"$(nproc)" || exit
 else
 	cd ./build || exit
 fi
@@ -53,11 +54,12 @@ esac
 # Function to generate AppImage
 makeAppImage() {
 
-	# Cleanup AppDir
-	mkdir -p /AppDir && (cd /AppDir && rm -rf -- ./* ./.??*)
-
 	# Get executable
-	executable="${1}"
+	executable="${1}" || return
+
+	# Cleanup AppDir
+	mkdir -p /AppDir || return
+	(cd /AppDir && rm -rf -- ./* ./.??*)
 
 	# Install QEMU and clean up
 	make DESTDIR=/AppDir -j"$(nproc)" install && rm -rf /AppDir/var
@@ -66,17 +68,17 @@ makeAppImage() {
 	find ./*-softmmu -name "${executable}" -exec cp -vf {} /AppDir/usr/bin/ \;
 
 	# Create desktop entry
-	mkdir -p /AppDir/usr/share/applications/ && \
-		cat <<- EOF > /AppDir/usr/share/applications/qemu.desktop
-		[Desktop Entry]
-		Name=${NAME}
-		Comment=Emulator
-		Exec=${executable}
-		Terminal=false
-		Type=Application
-		Icon=qemu
-		Categories=System;Emulator;
-		EOF
+	mkdir -p /AppDir/usr/share/applications/ || return
+	cat <<- EOF > /AppDir/usr/share/applications/qemu.desktop
+	[Desktop Entry]
+	Name=${NAME}
+	Comment=Emulator
+	Exec=${executable}
+	Terminal=false
+	Type=Application
+	Icon=qemu
+	Categories=System;Emulator;
+	EOF
 
 	# Create AppRun script
 	cat << '	EOF' | sed -r 's/^\t//' > /AppDir/AppRun
@@ -122,7 +124,7 @@ makeAppImage() {
 				|| OPTS="${OPTS} -${device} ${disk}"
 		elif [ ! "${SNAPSHOT}" ]; then
 			# Create data directory
-			mkdir -p "${QEMU_DATA}"
+			mkdir -p "${QEMU_DATA}" || exit
 			# Create disk image
 			qemu-img create -f qcow2 -b "${disk}" -F qcow2 \
 				"${QEMU_DATA}/${diskname}" \
@@ -161,7 +163,7 @@ makeAppImage() {
 		# Clean up existing icons
 		rm -rf /AppDir/usr/share/icons/hicolor
 		# Create icon directory
-		mkdir -p /AppDir/usr/share/icons/hicolor/scalable/apps/
+		mkdir -p /AppDir/usr/share/icons/hicolor/scalable/apps/ || exit
 		# Copy SVG file to icon directory
 		cp -f /input/icon.svg /AppDir/usr/share/icons/hicolor/scalable/apps/qemu.svg
 		# Generate PNG icon
@@ -173,7 +175,7 @@ makeAppImage() {
 		# Clean up existing icons
 		rm -rf /AppDir/usr/share/icons/hicolor
 		# Create icon directory
-		mkdir -p /AppDir/usr/share/icons/hicolor/"${icon_dir}"/apps/
+		mkdir -p /AppDir/usr/share/icons/hicolor/"${icon_dir}"/apps/ || exit
 		# Copy PNG icons
 		cp -f /input/icon.png /AppDir/usr/share/icons/hicolor/"${icon_dir}"/apps/qemu.png
 		cp -f /input/icon.png /AppDir/qemu.png
