@@ -46,8 +46,8 @@ case "${QEMU_OPTS%% *}" in
 		;;
 esac
 
-# Function to config AppDir and generate AppImage
-configAppDir() {
+# Function to generate AppImage
+makeAppImage() {
 
 	# Cleanup AppDir
 	mkdir -p /AppDir && (cd /AppDir && rm -rf -- ./* ./.??*)
@@ -197,7 +197,7 @@ if [ "${executable}" ]; then
 		# Set name
 		NAME="${APP_NAME:-$executable}"
 		# Run function
-		configAppDir "${executable}"
+		makeAppImage "${executable}"
 else
 	find ./*-softmmu -name 'qemu-system-*' -print \
 		| while IFS= read -r file; do
@@ -206,6 +206,6 @@ else
 		# Set name
 		NAME="${APP_NAME:-$executable}"
 		# Run function
-		configAppDir "${executable}"
+		makeAppImage "${executable}"
 	done
 fi
