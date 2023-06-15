@@ -76,12 +76,12 @@ RUN \
   wget -c -nv -P / \
   "https://download.qemu.org/qemu-${QEMU_VER}.tar.xz" && \
   wget -c -nv \
-  "https://github.com/probonopd/linuxdeployqt/releases/download/continuous/linuxdeployqt-continuous-$(uname -m).AppImage" \
-  -O /usr/local/bin/linuxdeployqt.appimage && \
-  chmod a+x /usr/local/bin/linuxdeployqt.appimage && \
-  mkdir -p /opt/linuxdeploy && cd /opt/linuxdeploy && \
-  /usr/local/bin/linuxdeployqt.appimage --appimage-extract && \
-  rm -f /usr/local/bin/linuxdeployqt.appimage
+  https://github.com/$(wget -q https://github.com/probonopd/go-appimage/releases/expanded_assets/continuous -O - | grep "appimagetool-.*-$(uname -m).AppImage" | head -n 1 | cut -d '"' -f 2) \
+  -O /usr/local/bin/appimagetool.appimage && \
+  chmod a+x /usr/local/bin/appimagetool.appimage && \
+  mkdir -p /opt/appimagetool && cd /opt/appimagetool && \
+  /usr/local/bin/appimagetool.appimage --appimage-extract && \
+  rm -f /usr/local/bin/appimagetool.appimage
 
 WORKDIR /src
 
