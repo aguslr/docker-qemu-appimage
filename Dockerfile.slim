@@ -18,6 +18,7 @@ RUN \
   libsdl2-dev libsdl2-image-dev \
   libslirp-dev \
   libspice-server-dev \
+  libusb-1.0-0-dev libusb-dev libusbredirhost-dev \
   libvncserver-dev \
   -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold" \
   && apt-get clean && rm -rf /var/lib/apt/lists/* /var/lib/apt/lists/*
