@@ -5,45 +5,7 @@ ARCH="$(uname -m)"
 VERSION="${QEMU_VER}"
 export ARCH VERSION
 
-# Download QEMU's source code
-if [ ! -x ./configure ]; then
-	wget "https://download.qemu.org/qemu-${VERSION}.tar.xz" -O - \
-		| tar -xJv --strip-components=1 || exit
-elif [ -f ./VERSION ]; then
-	VERSION=$(cat ./VERSION)
-fi
-
-# Configure and build QEMU
-if [ ! -d ./build ]; then
-	mkdir ./build || exit
-	cd ./build && \
-		../configure \
-		--prefix=/usr \
-		--enable-strip \
-		--enable-system \
-		--disable-user \
-		--disable-debug-info \
-		--disable-werror \
-		"$@" || exit
-	make -j"$(nproc)" || exit
-else
-	cd ./build || exit
-fi
-
-# Download AppImage deploy
-wget -c -nv \
-	"https://github.com/probonopd/linuxdeployqt/releases/download/continuous/linuxdeployqt-continuous-${ARCH}.AppImage" \
-	-O /usr/local/bin/linuxdeployqt.appimage && \
-	chmod a+x /usr/local/bin/linuxdeployqt.appimage
-
-# Extract AppImage deploy
-mkdir -p /opt/linuxdeploy || exit
-(
-	cd /opt/linuxdeploy && \
-		/usr/local/bin/linuxdeployqt.appimage --appimage-extract
-)
-
-# Get QEMU binaries
+# Check for provided QEMU executable
 case "${QEMU_OPTS%% *}" in
 	qemu-system*)
 		executable="${QEMU_OPTS%% *}"
@@ -198,6 +160,44 @@ makeAppImage() {
 
 }
 
+# Download QEMU's source code
+if [ ! -x ./configure ]; then
+	wget "https://download.qemu.org/qemu-${VERSION}.tar.xz" -O - \
+		| tar -xJv --strip-components=1 || exit
+elif [ -f ./VERSION ]; then
+	VERSION=$(cat ./VERSION)
+fi
+
+# Configure and build QEMU
+if [ ! -d ./build ]; then
+	mkdir ./build || exit
+	cd ./build && \
+		../configure \
+		--prefix=/usr \
+		--enable-strip \
+		--enable-system \
+		--disable-user \
+		--disable-debug-info \
+		--disable-werror \
+		"$@" || exit
+	make -j"$(nproc)" || exit
+else
+	cd ./build || exit
+fi
+
+# Download AppImage deploy
+wget -c -nv \
+	"https://github.com/probonopd/linuxdeployqt/releases/download/continuous/linuxdeployqt-continuous-${ARCH}.AppImage" \
+	-O /usr/local/bin/linuxdeployqt.appimage && \
+	chmod a+x /usr/local/bin/linuxdeployqt.appimage
+
+# Extract AppImage deploy
+mkdir -p /opt/linuxdeploy || exit
+(
+	cd /opt/linuxdeploy && \
+		/usr/local/bin/linuxdeployqt.appimage --appimage-extract
+)
+
 # Configure AppDir
 if [ "${executable}" ]; then
 		# Set name
@@ -205,8 +205,7 @@ if [ "${executable}" ]; then
 		# Run function
 		makeAppImage "${executable}"
 else
-	find ./*-softmmu -name 'qemu-system-*' -print \
-		| while IFS= read -r file; do
+	find ./*-softmmu -name 'qemu-system-*' -print | while IFS= read -r file; do
 		# Set executable
 		executable="$(basename "${file}")"
 		# Set name
