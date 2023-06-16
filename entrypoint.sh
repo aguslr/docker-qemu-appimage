@@ -65,7 +65,20 @@ makeAppImage() {
 	# Set data directory
 	QEMU_DATA="${XDG_DATA_HOME}/qemu.appimage/${APPIMAGE_NAME:-QEMU}"
 
-	# Check arguments
+	# Check arguments for a command
+	case "${1}" in
+		--command=list)
+			ls -1 "${HERE}/usr/bin"
+			exit
+			;;
+		--command=*)
+			command="${1##*=}" && shift
+			command -v "${command}" >/dev/null && ${command} "${@}"
+			exit
+			;;
+	esac
+
+	# Check arguments for `-snapshot`
 	for ARG in "${@}"; do
 		[ "${ARG}" = '-snapshot' ] && SNAPSHOT=1
 	done
