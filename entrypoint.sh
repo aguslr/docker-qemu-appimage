@@ -26,8 +26,9 @@ makeAppImage() {
 	# Install QEMU and clean up
 	make DESTDIR=/AppDir -j"$(nproc)" install && rm -rf /AppDir/var
 
-	# Copy QEMU binary
-	find ./*-softmmu -name "${executable}" -exec cp -vf {} /AppDir/usr/bin/ \;
+	# Remove unnecessary QEMU binaries
+	find /AppDir -executable -type f \
+		\( -name 'qemu-system-*' -and -not -name "${executable}" \) -delete
 
 	# Create desktop entry
 	mkdir -p /AppDir/usr/share/applications/ || return
