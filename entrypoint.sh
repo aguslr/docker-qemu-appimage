@@ -177,6 +177,7 @@ if [ ! -d ./build ]; then
 		--prefix=/usr \
 		--enable-strip \
 		--enable-system \
+		--enable-tools \
 		--disable-user \
 		--disable-debug-info \
 		--disable-werror \
