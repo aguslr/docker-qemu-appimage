@@ -115,10 +115,17 @@ makeAppImage() {
 	EOF
 
 	# Add executable and options
-	cat <<- EOF >> /AppDir/AppRun
-	# Run QEMU
-	${executable} ${QEMU_OPTS} \${OPTS} "\${@}"
-	EOF
+	if [ "${APP_NAME}" ]; then
+		cat <<- EOF >> /AppDir/AppRun
+		# Run QEMU
+		${executable} ${QEMU_OPTS} -name "${APP_NAME}" \${OPTS} "\${@}"
+		EOF
+	else
+		cat <<- EOF >> /AppDir/AppRun
+		# Run QEMU
+		${executable} ${QEMU_OPTS} \${OPTS} "\${@}"
+		EOF
+	fi
 	chmod a+x /AppDir/AppRun
 
 	# Set App icon
