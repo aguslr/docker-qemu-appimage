@@ -47,9 +47,9 @@ The image is configured using environment variables passed at runtime:
 Here's an example to create an AppImage for a Pentium 3 machine with 64 MB of
 RAM:
 
-    docker run --rm -e 'APP_NAME=Pentium 3' -e 'QEMU_VER=7.2.1' \
-      -e 'QEMU_OPTS=qemu-system-i386 -cpu pentium 3 -m 64' \
-      -v ${PWD}/output:/output \
+    docker run --rm -e APP_NAME='Pentium 3' -e QEMU_VER='7.2.1' \
+      -e QEMU_OPTS='qemu-system-i386 -cpu pentium 3 -m 64' \
+      -v "${PWD}"/output:/output \
       docker.io/aguslr/qemu-appimage:latest --target-list=i386-softmmu
 
 
@@ -75,9 +75,9 @@ AppImage.
 - Disable VNC support in QEMU and create an AppImage for a *Sun Solaris 9* disk
   (`./input/hda.qcow2`):
 
-       docker run --rm -e 'APP_NAME=Solaris 9' \
-         -e 'QEMU_OPTS=qemu-system-sparc -M SS-5 -m 256 -vga cg3 -g 1024x768' \
-         -v ${PWD}/input:/input -v ${PWD}/output:/output \
+       docker run --rm -e APP_NAME='Solaris 9' \
+         -e QEMU_OPTS='qemu-system-sparc -M SS-5 -m 256 -vga cg3 -g 1024x768' \
+         -v "${PWD}"/input:/input -v "${PWD}"/output:/output \
          docker.io/aguslr/qemu-appimage:latest \
          --target-list=sparc-softmmu --disable-vnc && \
          ./output/Solaris_9-8.0.2-x86_64.AppImage -snapshot -monitor stdio
@@ -91,9 +91,9 @@ AppImage.
 - Disable *PulseAudio* and *SLiRP* support in QEMU and create an AppImage for a
   *Mac OS 9* disk (`./input/hda.qcow2`):
 
-       docker run --rm -e 'APP_NAME=Mac OS 9.2' \
-         -e 'QEMU_OPTS=qemu-system-ppc -machine mac99 -m 256 -nic none -g 1024x768x32' \
-         -v ${PWD}/input:/input -v ${PWD}/output:/output \
+       docker run --rm -e APP_NAME='Mac OS 9.2' \
+         -e QEMU_OPTS='qemu-system-ppc -machine mac99 -m 256 -nic none -g 1024x768x32' \
+         -v "${PWD}"/input:/input -v "${PWD}"/output:/output \
          docker.io/aguslr/qemu-appimage:latest \
          --target-list=ppc-softmmu --disable-pa --disable-slirp && \
          ./output/Mac_OS_9.2-8.0.2-x86_64.AppImage -snapshot -vnc :0
