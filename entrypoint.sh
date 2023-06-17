@@ -153,8 +153,8 @@ makeAppImage() {
 	unset QTDIR QT_PLUGIN_PATH LD_LIBRARY_PATH
 	(
 		cd /opt/linuxdeploy && \
-			./squashfs-root/AppRun /AppDir/usr/share/applications/*.desktop -bundle-non-qt-libs && \
-			./squashfs-root/AppRun /AppDir/usr/share/applications/*.desktop -appimage && \
+			./squashfs-root/AppRun /AppDir/usr/share/applications/*.desktop \
+			-appimage -bundle-non-qt-libs -no-copy-copyright-files -no-plugins -no-translations && \
 			find /AppDir -executable -type f -exec ldd {} \; | grep " => /usr" | cut -d " " -f 2-3 | sort | uniq
 		mv -vf ./*.AppImage /output
 	)
