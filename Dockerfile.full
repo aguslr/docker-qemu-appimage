@@ -23,6 +23,7 @@ RUN \
   libdaxctl-dev \
   libdrm-dev \
   libdw-dev \
+  libepoxy-dev \
   libfdt-dev \
   libfuse3-dev \
   libgbm-dev \

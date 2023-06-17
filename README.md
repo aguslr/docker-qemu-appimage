@@ -30,8 +30,8 @@ There are two flavors for this docker container:
   disable any unwanted feature, arguments (e.g. `--disable-gtk`) must be passed
   to the container image.
 
-- `slim`: Provides basic QEMU functionality (e.g. graphics, audio, networking,
-  USB, [remote viewing via *SPICE*/*VNC*][7], etc.).
+- `slim`: Provides basic QEMU functionality (e.g., graphics, audio, *OpenGL*,
+  networking, USB, [remote viewing via *SPICE*/*VNC*][7], etc.).
 
 
 ### Variables
