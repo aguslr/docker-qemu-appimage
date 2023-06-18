@@ -10,7 +10,7 @@ RUN \
   apt-get install -y \
   wget imagemagick file build-essential && \
   apt-get install -y --no-install-recommends \
-  bison flex ninja-build valgrind \
+  git bison flex ninja-build python3-venv valgrind \
   libaio-dev \
   libbluetooth-dev \
   libbpf-dev \
