@@ -6,10 +6,6 @@ on:
       - main
     paths:
       - 'README.*'
-  workflow_run:
-    workflows: ['Publish Docker Image']
-    types:
-      - completed
   workflow_dispatch:
 
 env:
