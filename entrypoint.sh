@@ -57,10 +57,15 @@ makeAppImage() {
 	LD_LIBRARY_PATH="${HERE}/usr/lib":${LD_LIBRARY_PATH}
 	export PATH LD_LIBRARY_PATH
 
-	# Make sure that XDG_CONFIG_HOME and XDG_DATA_HOME are set
-	XDG_CONFIG_HOME="${XDG_CONFIG_HOME:=$HOME/.config}"
-	XDG_DATA_HOME="${XDG_DATA_HOME:=$HOME/.local/share}"
-	export XDG_CONFIG_HOME XDG_DATA_HOME
+	# Check if AppImage's portable home was set
+	if [ "$(basename "$HOME")" = "${APPIMAGE}.home" ]; then
+		# Set XDG_DATA_HOME
+		XDG_DATA_HOME="$HOME/.local/share"
+	else
+		# Set XDG_DATA_HOME
+		XDG_DATA_HOME="${XDG_DATA_HOME:=$HOME/.local/share}"
+	fi
+	export XDG_DATA_HOME
 
 	# Set data directory
 	QEMU_DATA="${XDG_DATA_HOME}/qemu.appimage/${APPIMAGE_NAME:-QEMU}"
