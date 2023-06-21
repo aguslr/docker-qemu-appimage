@@ -2,8 +2,12 @@
 
 # Check arguments for a command shell
 case "${1}" in
-	sh|bash|/bin/sh|/bin/bash)
+	sh|bash)
 		command -v "${1}" >/dev/null && ${1}
+		exit
+		;;
+	/bin/sh|/bin/bash)
+		[ -x "${1}" ] && ${1}
 		exit
 		;;
 esac
