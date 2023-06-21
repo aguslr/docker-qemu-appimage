@@ -91,6 +91,13 @@ makeAppImage() {
 			;;
 	esac
 
+	# Add options for BIOS
+	if [ -f "${HERE}/bios.bin" ]; then
+		OPTS="${OPTS} -bios ${HERE}/bios.bin"
+	elif [ -f "${HERE}/bios.rom" ]; then
+		OPTS="${OPTS} -bios ${HERE}/bios.rom"
+	fi
+
 	# Check arguments for `-snapshot`
 	for ARG in "${@}"; do
 		[ "${ARG}" = '-snapshot' ] && SNAPSHOT=1

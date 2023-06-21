@@ -368,11 +368,12 @@ Any other argument will be passed [directly to the QEMU binary][8] (e.g.,
 Custom Virtual Machines
 -----------------------
 
-We can place disk images (QCOW2, ISO, raw images, etc.) in an `input` directory
-and they will be copied and loaded at runtime:
+We can place disk images (QCOW2, ISO, raw images, etc.) or BIOS files (BIN, ROM)
+in an `input` directory and they will be copied and loaded at runtime:
 
 | Filename    | Function    | Device   |
 | :---------- | :---------- | :------- |
+| `bios.rom`  | BIOS file   | `-bios`  |
 | `fda.img`   | Floppy disk | `-fda`   |
 | `cdrom.iso` | CD-ROM      | `-cdrom` |
 | `hda.qcow2` | Hard drive  | `-hda`   |
