@@ -1,5 +1,13 @@
 #!/bin/sh
 
+# Check arguments for a command shell
+case "${1}" in
+	sh|bash|/bin/sh|/bin/bash)
+		command -v "${1}" >/dev/null && ${1}
+		exit
+		;;
+esac
+
 # Set environment
 ARCH="$(uname -m)"
 VERSION="${QEMU_VER}"
