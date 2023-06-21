@@ -378,10 +378,10 @@ in an `input` directory and they will be copied and loaded at runtime:
 | `cdrom.iso` | CD-ROM      | `-cdrom` |
 | `hda.qcow2` | Hard drive  | `-hda`   |
 
-These files will be read-only, therefore [changes to the disk][3] will be saved
-to a *QCOW2* image in a directory named after the AppImage inside
-`${XDG_DATA_HOME}/qemu.appimage`, unless we pass the `-snapshot` argument to the
-AppImage.
+**Note**: The hard drive file will be read-only therefore, unless we pass the
+`-snapshot` argument to the AppImage, [changes to the disk][3] will be saved to
+a *QCOW2* image in a directory named after the AppImage inside
+`${XDG_DATA_HOME}/qemu.appimage` (usually `~/.local/share/qemu.appimage`).
 
 
 ### Examples
