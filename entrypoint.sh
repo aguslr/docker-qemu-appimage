@@ -213,19 +213,6 @@ else
 	cd ./build || exit
 fi
 
-# Download AppImage deploy
-wget -c -nv \
-	"https://github.com/probonopd/linuxdeployqt/releases/download/continuous/linuxdeployqt-continuous-${ARCH}.AppImage" \
-	-O /usr/local/bin/linuxdeployqt.appimage && \
-	chmod a+x /usr/local/bin/linuxdeployqt.appimage
-
-# Extract AppImage deploy
-mkdir -p /opt/linuxdeploy || exit
-(
-	cd /opt/linuxdeploy && \
-		/usr/local/bin/linuxdeployqt.appimage --appimage-extract
-)
-
 # Configure AppDir
 if [ "${executable}" ]; then
 		# Set name

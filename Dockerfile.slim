@@ -24,6 +24,15 @@ RUN \
   -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold" \
   && apt-get clean && rm -rf /var/lib/apt/lists/* /var/lib/apt/lists/*
 
+RUN \
+  wget -c -nv \
+  "https://github.com/probonopd/linuxdeployqt/releases/download/continuous/linuxdeployqt-continuous-$(uname -m).AppImage" \
+  -O /usr/local/bin/linuxdeployqt.appimage && \
+  chmod a+x /usr/local/bin/linuxdeployqt.appimage && \
+  mkdir -p /opt/linuxdeploy && cd /opt/linuxdeploy && \
+  /usr/local/bin/linuxdeployqt.appimage --appimage-extract && \
+  rm -f /usr/local/bin/linuxdeployqt.appimage
+
 WORKDIR /opt/qemu
 
 COPY entrypoint.sh /entrypoint.sh
