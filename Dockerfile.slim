@@ -33,10 +33,10 @@ RUN \
   /usr/local/bin/linuxdeployqt.appimage --appimage-extract && \
   rm -f /usr/local/bin/linuxdeployqt.appimage
 
-WORKDIR /opt/qemu
+WORKDIR /src
 
 COPY entrypoint.sh /entrypoint.sh
 
-VOLUME /opt/qemu /input /output
+VOLUME /src /input /output
 
 ENTRYPOINT ["/entrypoint.sh"]
