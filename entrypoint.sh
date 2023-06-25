@@ -61,7 +61,7 @@ makeAppImage() {
 
 	# Set environment
 	HERE="$(dirname "$(readlink -f "${0}")")"
-	APPIMAGE=$(basename "$ARGV0")
+	APPIMAGE="${ARGV0##*/}"
 	APPIMAGE_NAME="${APPIMAGE%.*}"
 
 	# Set paths
@@ -70,7 +70,7 @@ makeAppImage() {
 	export PATH LD_LIBRARY_PATH
 
 	# Check if AppImage's portable home was set
-	if [ "$(basename "$HOME")" = "${APPIMAGE}.home" ]; then
+	if [ "${HOME##*/}" = "${APPIMAGE}.home" ]; then
 		# Set XDG_DATA_HOME
 		XDG_DATA_HOME="$HOME/.local/share"
 	else
@@ -85,12 +85,14 @@ makeAppImage() {
 	# Check arguments for a command
 	case "${1}" in
 		--command=list)
-			ls -1 "${HERE}/usr/bin"
+			for bin in "${HERE}/usr/bin"/*; do
+				echo "${bin##*/}"
+			done
 			exit
 			;;
 		--command=*)
 			command="${1##*=}" && shift
-			command -v "${command}" >/dev/null && ${command} "${@}"
+			[ -x "${HERE}/usr/bin/${command}" ] && ${command} "${@}"
 			exit
 			;;
 	esac
@@ -112,7 +114,7 @@ makeAppImage() {
 		# Check file exists
 		[ -f "${disk}" ] || continue
 		# Get filename
-		diskname="$(basename "${disk}")"
+		diskname="${disk##*/}"
 		# Get devicename
 		device="${diskname%.*}"
 		# Check for backing file
@@ -140,7 +142,7 @@ makeAppImage() {
 		# Check file exists
 		[ -f "${floppy}" ] || continue
 		# Get filename
-		floppyname="$(basename "${floppy}")"
+		floppyname="${floppy##*/}"
 		# Get devicename
 		device="${floppyname%.*}"
 		OPTS="${OPTS} -${device} ${floppy}"
