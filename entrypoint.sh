@@ -60,7 +60,7 @@ makeAppImage() {
 	#!/bin/sh
 
 	# Set environment
-	HERE="$(dirname "$(readlink -f "${0}")")"
+	HERE="${0%/*}"
 	APPIMAGE="${ARGV0##*/}"
 	APPIMAGE_NAME="${APPIMAGE%.*}"
 
