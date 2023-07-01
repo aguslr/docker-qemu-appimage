@@ -188,6 +188,7 @@ makeAppImage() {
 	fi
 
 	# Copy binaries and images
+	find /input -type f -iname '*.fd' -exec cp -vf {} /AppDir/ \;
 	find /input -type f \( -iname '*.bin' -or -iname '*.rom' \) \
 		-exec cp -vf {} /AppDir/ \;
 	find /input -type f \( -iname '*.qcow2' -or -iname '*.img' -or -iname '*.iso' \) \
