@@ -71,16 +71,13 @@ makeAppImage() {
 
 	# Check if AppImage's portable home was set
 	if [ "${HOME##*/}" = "${APPIMAGE}.home" ]; then
-		# Set XDG_DATA_HOME
-		XDG_DATA_HOME="$HOME/.local/share"
+		# Set data directory
+		QEMU_DATA="${HOME}"
 	else
-		# Set XDG_DATA_HOME
-		XDG_DATA_HOME="${XDG_DATA_HOME:=$HOME/.local/share}"
+		# Set data directory
+		XDG_DATA_HOME="${XDG_DATA_HOME:-$HOME/.local/share}"
+		QEMU_DATA="${XDG_DATA_HOME}/qemu.appimage/${APPIMAGE_NAME:-QEMU}"
 	fi
-	export XDG_DATA_HOME
-
-	# Set data directory
-	QEMU_DATA="${XDG_DATA_HOME}/qemu.appimage/${APPIMAGE_NAME:-QEMU}"
 
 	# Check arguments for a command
 	case "${1}" in
