@@ -397,9 +397,9 @@ a *QCOW2* image in a directory named after the AppImage inside
          ./output/Solaris_9-8.0.2-x86_64.AppImage -snapshot -monitor stdio
 
 <picture>
-  <source media="(prefers-color-scheme: light)" srcset="https://github.com/aguslr/docker-qemu-appimage/raw/main/screenshots/solaris9-light.png">
-  <source media="(prefers-color-scheme: dark)"  srcset="https://github.com/aguslr/docker-qemu-appimage/raw/main/screenshots/solaris9-dark.png">
-  <img title="Solaris 9" alt="solaris9" src="https://github.com/aguslr/docker-qemu-appimage/raw/main/screenshots/solaris9-light.png">
+  <source media="(prefers-color-scheme: light)" srcset="screenshots/solaris9-light.png">
+  <source media="(prefers-color-scheme: dark)"  srcset="screenshots/solaris9-dark.png">
+  <img title="Solaris 9" alt="solaris9" src="screenshots/solaris9-light.png">
 </picture>
 
 - Disable *PulseAudio* and *SLiRP* support in QEMU and create an AppImage for a
@@ -413,9 +413,9 @@ a *QCOW2* image in a directory named after the AppImage inside
          ./output/Mac_OS_9.2-8.0.2-x86_64.AppImage -snapshot -vnc :0
 
 <picture>
-  <source media="(prefers-color-scheme: light)" srcset="https://github.com/aguslr/docker-qemu-appimage/raw/main/screenshots/macos9-light.png">
-  <source media="(prefers-color-scheme: dark)"  srcset="https://github.com/aguslr/docker-qemu-appimage/raw/main/screenshots/macos9-dark.png">
-  <img title="Mac OS 9.2" alt="macos9" src="https://github.com/aguslr/docker-qemu-appimage/raw/main/screenshots/macos9-light.png">
+  <source media="(prefers-color-scheme: light)" srcset="screenshots/macos9-light.png">
+  <source media="(prefers-color-scheme: dark)"  srcset="screenshots/macos9-dark.png">
+  <img title="Mac OS 9.2" alt="macos9" src="screenshots/macos9-light.png">
 </picture>
 
 
