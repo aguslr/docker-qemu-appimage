@@ -1,7 +1,7 @@
 [aguslr/docker-qemu-appimage][1]
 ================================
 
-[![publish-docker-image](https://github.com/aguslr/docker-qemu-appimage/actions/workflows/docker-publish.yml/badge.svg)](https://github.com/aguslr/docker-qemu-appimage/actions/workflows/docker-publish.yml) [![docker-pulls](https://img.shields.io/docker/pulls/aguslr/qemu-appimage)](https://hub.docker.com/r/aguslr/qemu-appimage) [![image-size](https://img.shields.io/docker/image-size/aguslr/qemu-appimage/latest)](https://hub.docker.com/r/aguslr/qemu-appimage)
+[![docker-pulls](https://img.shields.io/docker/pulls/aguslr/qemu-appimage)](https://hub.docker.com/r/aguslr/qemu-appimage) [![image-size](https://img.shields.io/docker/image-size/aguslr/qemu-appimage/latest)](https://hub.docker.com/r/aguslr/qemu-appimage)
 
 
 This *Docker* image sets up a container to build QEMU AppImages.
