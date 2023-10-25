@@ -43,7 +43,7 @@ The image is configured using environment variables passed at runtime:
 | Variable    | Function                    | Default         | Required |
 | :---------- | :-------------------------- | :-------------- | -------- |
 | `APP_NAME`  | Name of the app to package  | `qemu-system-*` | N        |
-| `QEMU_VER`  | Version of QEMU to compile  | `8.1.0`         | N        |
+| `QEMU_VER`  | Version of QEMU to compile  | `8.1.2`         | N        |
 | `QEMU_OPTS` | Custom QEMU runtime options | EMPTY           | N        |
 
 Here's an example to create an AppImage for a Pentium 3 machine with 64 MB of
@@ -63,7 +63,7 @@ Options
 
 Any argument for the container image will be passed to [the `configure`
 script][2] used to enable or disable QEMU features at build time. For QEMU
-version 8.1.0, these are the available options:
+version 8.1.2, these are the available options:
 
 <details><summary>Options</summary>
 
@@ -394,7 +394,7 @@ a *QCOW2* image in a directory named after the AppImage inside
          -v "${PWD}"/input:/input -v "${PWD}"/output:/output \
          docker.io/aguslr/qemu-appimage:latest \
          --target-list=sparc-softmmu --disable-vnc && \
-         ./output/Solaris_9-8.1.0-x86_64.AppImage -snapshot -monitor stdio
+         ./output/Solaris_9-8.1.2-x86_64.AppImage -snapshot -monitor stdio
 
 <picture>
   <source media="(prefers-color-scheme: light)" srcset="screenshots/solaris9-light.png">
@@ -410,7 +410,7 @@ a *QCOW2* image in a directory named after the AppImage inside
          -v "${PWD}"/input:/input -v "${PWD}"/output:/output \
          docker.io/aguslr/qemu-appimage:latest \
          --target-list=ppc-softmmu --disable-pa --disable-slirp && \
-         ./output/Mac_OS_9.2-8.1.0-x86_64.AppImage -snapshot -vnc :0
+         ./output/Mac_OS_9.2-8.1.2-x86_64.AppImage -snapshot -vnc :0
 
 <picture>
   <source media="(prefers-color-scheme: light)" srcset="screenshots/macos9-light.png">

@@ -2,7 +2,7 @@ ARG BASE_IMAGE=library/ubuntu:focal
 
 FROM docker.io/${BASE_IMAGE}
 
-ENV QEMU_VER=8.1.0
+ENV QEMU_VER=8.1.2
 
 RUN \
   apt-get update && \
