@@ -208,8 +208,12 @@ makeAppImage() {
 
 # Download QEMU's source code
 if [ ! -x ./configure ]; then
-	wget "https://download.qemu.org/qemu-${VERSION}.tar.xz" -O - \
-		| tar -xJv --strip-components=1 || exit
+	if [ -f "/qemu-${VERSION}.tar.xz" ]; then
+		tar -xJv --strip-components=1 -f "/qemu-${VERSION}.tar.xz" || exit
+	else
+		wget "https://download.qemu.org/qemu-${VERSION}.tar.xz" -O - \
+			| tar -xJv --strip-components=1 || exit
+	fi
 elif [ -f ./VERSION ]; then
 	VERSION=$(cat ./VERSION)
 fi

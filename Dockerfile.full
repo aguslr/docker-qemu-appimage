@@ -73,6 +73,8 @@ RUN \
   && apt-get clean && rm -rf /var/lib/apt/lists/* /var/lib/apt/lists/*
 
 RUN \
+  wget -c -nv -P / \
+  "https://download.qemu.org/qemu-${QEMU_VER}.tar.xz" && \
   wget -c -nv \
   "https://github.com/probonopd/linuxdeployqt/releases/download/continuous/linuxdeployqt-continuous-$(uname -m).AppImage" \
   -O /usr/local/bin/linuxdeployqt.appimage && \
