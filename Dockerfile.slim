@@ -8,7 +8,7 @@ RUN \
   apt-get update && \
   env DEBIAN_FRONTEND=noninteractive \
   apt-get install -y \
-  wget imagemagick file build-essential && \
+  wget imagemagick file build-essential python3-pip && \
   apt-get install -y --no-install-recommends \
   bison flex ninja-build valgrind \
   libcap-ng-dev \
