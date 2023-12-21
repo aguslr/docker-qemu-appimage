@@ -43,7 +43,7 @@ The image is configured using environment variables passed at runtime:
 | Variable    | Function                    | Default         | Required |
 | :---------- | :-------------------------- | :-------------- | -------- |
 | `APP_NAME`  | Name of the app to package  | `qemu-system-*` | N        |
-| `QEMU_VER`  | Version of QEMU to compile  | `8.1.3`         | N        |
+| `QEMU_VER`  | Version of QEMU to compile  | `8.2.0`         | N        |
 | `QEMU_OPTS` | Custom QEMU runtime options | EMPTY           | N        |
 
 Here's an example to create an AppImage for a Pentium 3 machine with 64 MB of
@@ -63,7 +63,7 @@ Options
 
 Any argument for the container image will be passed to [the `configure`
 script][2] used to enable or disable QEMU features at build time. For QEMU
-version 8.1.3, these are the available options:
+version 8.2.0, these are the available options:
 
 <details><summary>Options</summary>
 
@@ -73,7 +73,6 @@ Options: [defaults in brackets after descriptions]
 
 Standard options:
   --help                   print this message
-  --prefix=PREFIX          install in PREFIX [/usr]
   --target-list=LIST       set target list (default: build all)
                            Available targets: aarch64-softmmu alpha-softmmu
                            arm-softmmu avr-softmmu cris-softmmu hppa-softmmu
@@ -88,10 +87,11 @@ Standard options:
   --target-list-exclude=LIST exclude a set of targets from the default target-list
 
 Advanced options (experts only):
+  -Dmesonoptname=val       passthrough option to meson unmodified
   --cross-prefix=PREFIX    use PREFIX for compile tools, PREFIX can be blank []
   --cc=CC                  use C compiler CC [cc]
-  --host-cc=CC             use C compiler CC [cc] for code run at
-                           build time
+  --host-cc=CC             when cross compiling, use C compiler CC for code run
+                           at build time [cc]
   --cxx=CXX                use C++ compiler CXX [c++]
   --objcc=OBJCC            use Objective-C compiler OBJCC [cc]
   --extra-cflags=CFLAGS    append extra C compiler flags CFLAGS
@@ -101,37 +101,23 @@ Advanced options (experts only):
   --cross-cc-ARCH=CC       use compiler when building ARCH guest test cases
   --cross-cc-cflags-ARCH=  use compiler flags when building ARCH guest tests
   --cross-prefix-ARCH=PREFIX cross compiler prefix when building ARCH guest test cases
-  --make=MAKE              use specified make [make]
   --python=PYTHON          use specified python [/usr/bin/python3]
-  --meson=MESON            use specified meson []
   --ninja=NINJA            use specified ninja []
-  --smbd=SMBD              use specified smbd []
-  --with-git=GIT           use specified git [git]
-  --with-git-submodules=update   update git submodules (default if .git dir exists)
-  --with-git-submodules=validate fail if git submodules are not up to date
-  --with-git-submodules=ignore   do not update or check git submodules (default if no .git dir)
   --static                 enable static build [no]
-  --bindir=PATH            install binaries in PATH
-  --with-suffix=SUFFIX     suffix for QEMU data inside datadir/libdir/sysconfdir/docdir [qemu]
   --without-default-features default all --enable-* options to "disabled"
   --without-default-devices  do not include any device that is not needed to
                            start the emulator (only use if you are including
                            desired devices in configs/devices/)
   --with-devices-ARCH=NAME override default configs/devices
   --enable-debug           enable common debug build options
-  --enable-sanitizers      enable default sanitizers
-  --enable-tsan            enable thread sanitizer
-  --disable-werror         disable compilation abort on warning
-  --disable-stack-protector disable compiler-provided stack protection
   --cpu=CPU                Build for host CPU [x86_64]
-  --with-coroutine=BACKEND coroutine backend. Supported options:
-                           ucontext, sigaltstack, windows
-  --enable-plugins
-                           enable plugins via shared library loading
   --disable-containers     don't use containers for cross-building
+  --container-engine=TYPE  which container engine to use [auto]
   --gdb=GDB-path           gdb to use for gdbstub tests []
   --audio-drv-list=CHOICES Set audio driver list [default] (choices: alsa/co
-                           reaudio/default/dsound/jack/oss/pa/sdl/sndio)
+                           reaudio/default/dsound/jack/oss/pa/pipewire/sdl/s
+                           ndio)
+  --bindir=VALUE           Executable directory [bin]
   --block-drv-ro-whitelist=VALUE
                            set block driver read-only whitelist (by default
                            affects only QEMU, not tools like qemu-img)
@@ -140,10 +126,13 @@ Advanced options (experts only):
                            affects only QEMU, not tools like qemu-img)
   --datadir=VALUE          Data file directory [share]
   --disable-coroutine-pool coroutine freelist (better performance)
+  --disable-debug-info     Enable debug symbols and other information
   --disable-hexagon-idef-parser
                            use idef-parser to automatically generate TCG
                            code for the Hexagon frontend
   --disable-install-blobs  install provided firmware blobs
+  --disable-qom-cast-debug cast debugging support
+  --disable-relocatable    toggle relocatable install
   --docdir=VALUE           Base directory for documentation installation
                            (can be empty) [share/doc]
   --enable-block-drv-whitelist-in-tools
@@ -156,25 +145,27 @@ Advanced options (experts only):
   --enable-debug-mutex     mutex debugging support
   --enable-debug-stack-usage
                            measure coroutine stack usage
+  --enable-debug-tcg       TCG debugging
   --enable-fdt[=CHOICE]    Whether and how to find the libfdt library
                            (choices: auto/disabled/enabled/internal/system)
   --enable-fuzzing         build fuzzing targets
   --enable-gcov            Enable coverage tracking.
-  --enable-gprof           QEMU profiling with gprof
   --enable-lto             Use link time optimization
   --enable-malloc=CHOICE   choose memory allocator to use [system] (choices:
                            jemalloc/system/tcmalloc)
   --enable-module-upgrades try to load modules from alternate paths for
                            upgrades
-  --enable-profiler        profiler support
-  --enable-qom-cast-debug  cast debugging support
   --enable-rng-none        dummy RNG, avoid using /dev/(u)random and
                            getrandom()
+  --enable-safe-stack      SafeStack Stack Smash Protection (requires
+                           clang/llvm and coroutine backend ucontext)
+  --enable-sanitizers      enable default sanitizers
   --enable-strip           Strip targets on install
   --enable-tcg-interpreter TCG with bytecode interpreter (slow)
   --enable-trace-backends=CHOICES
                            Set available tracing backends [log] (choices:
                            dtrace/ftrace/log/nop/simple/syslog/ust)
+  --enable-tsan            enable thread sanitizer
   --firmwarepath=VALUES    search PATH for firmware files [share/qemu-
                            firmware]
   --iasl=VALUE             Path to ACPI disassembler
@@ -186,19 +177,30 @@ Advanced options (experts only):
   --localedir=VALUE        Locale data directory [share/locale]
   --localstatedir=VALUE    Localstate data directory [/var/local]
   --mandir=VALUE           Manual page directory [share/man]
-  --sphinx-build=VALUE     Use specified sphinx-build for building document
-                           [sphinx-build]
+  --prefix=VALUE           Installation prefix [/usr/local]
+  --qemu-ga-distro=VALUE   second path element in qemu-ga registry entries
+                           [Linux]
+  --qemu-ga-manufacturer=VALUE
+                           "manufacturer" name for qemu-ga registry entries
+                           [QEMU]
+  --qemu-ga-version=VALUE  version number for qemu-ga installer
+  --smbd=VALUE             Path to smbd for slirp networking
   --sysconfdir=VALUE       Sysconf data directory [etc]
   --tls-priority=VALUE     Default TLS protocol/cipher priority string
                            [NORMAL]
+  --with-coroutine=CHOICE  coroutine backend to use (choices:
+                           auto/sigaltstack/ucontext/windows)
   --with-pkgversion=VALUE  use specified string as sub-version of the
                            package
+  --with-suffix=VALUE      Suffix for QEMU data/modules/config directories
+                           (can be empty) [qemu]
   --with-trace-file=VALUE  Trace file prefix for simple backend [trace]
 
 Optional features, enabled with --enable-FEATURE and
 disabled with --disable-FEATURE, default is enabled if available
 (unless built with --without-default-features):
 
+  af-xdp          AF_XDP network backend support
   alsa            ALSA sound support
   attr            attr/xattr support
   auth-pam        PAM access control
@@ -215,6 +217,7 @@ disabled with --disable-FEATURE, default is enabled if available
   capstone        Whether and how to find the capstone library
   cloop           cloop image format support
   cocoa           Cocoa user interface (macOS only)
+  colo-proxy      colo-proxy support
   coreaudio       CoreAudio sound support
   crypto-afalg    Linux AF_ALG crypto backend driver
   curl            CURL block device driver
@@ -234,7 +237,7 @@ disabled with --disable-FEATURE, default is enabled if available
   gtk-clipboard   clipboard support for the gtk UI (EXPERIMENTAL, MAY HANG)
   guest-agent     Build QEMU Guest Agent
   guest-agent-msi Build MSI package for the QEMU Guest Agent
-  hax             HAX acceleration support
+  hv-balloon      hv-balloon driver (requires Glib 2.68+ GTree API)
   hvf             HVF acceleration support
   iconv           Font glyph conversion support
   jack            JACK sound support
@@ -244,6 +247,7 @@ disabled with --disable-FEATURE, default is enabled if available
   libdaxctl       libdaxctl support
   libdw           debuginfo support
   libiscsi        libiscsi userspace initiator
+  libkeyutils     Linux keyutils support
   libnfs          libnfs block device driver
   libpmem         libpmem support
   libssh          ssh block device support
@@ -258,6 +262,7 @@ disabled with --disable-FEATURE, default is enabled if available
   lzo             lzo compression support
   malloc-trim     enable libc malloc_trim() for memory optimization
   membarrier      membarrier system call (for Linux 4.14+ or Windows
+  modules         modules support (non Windows)
   mpath           Multipath persistent reservation passthrough
   multiprocess    Out of process device emulation support
   netmap          netmap network backend support
@@ -268,6 +273,9 @@ disabled with --disable-FEATURE, default is enabled if available
   oss             OSS sound support
   pa              PulseAudio sound support
   parallels       parallels image format support
+  pipewire        PipeWire sound support
+  pixman          pixman support
+  plugins         TCG plugins via shared library loading
   png             PNG support with libpng
   pvrdma          Enable PVRDMA support
   qcow1           qcow1 image format support
@@ -276,6 +284,7 @@ disabled with --disable-FEATURE, default is enabled if available
   rbd             Ceph block device driver
   rdma            Enable RDMA-based migration
   replication     replication support
+  rutabaga-gfx    rutabaga_gfx support
   sdl             SDL user interface
   sdl-image       SDL Image support for icons
   seccomp         seccomp support
@@ -288,6 +297,7 @@ disabled with --disable-FEATURE, default is enabled if available
   sparse          sparse checker
   spice           Spice server support
   spice-protocol  Spice protocol support
+  stack-protector compiler-provided stack protection
   tcg             TCG support
   tools           build support utilities that come with QEMU
   tpm             TPM support
@@ -299,6 +309,7 @@ disabled with --disable-FEATURE, default is enabled if available
                   VDUSE block export support
   vfio-user-server
                   vfio-user server support
+  vhdx            vhdx image format support
   vhost-crypto    vhost-user crypto backend support
   vhost-kernel    vhost kernel backend support
   vhost-net       vhost-net kernel acceleration support
@@ -308,12 +319,17 @@ disabled with --disable-FEATURE, default is enabled if available
   vhost-vdpa      vhost-vdpa kernel backend support
   virglrenderer   virgl rendering support
   virtfs          virtio-9p support
+  virtfs-proxy-helper
+                  virtio-9p proxy helper support
+  vmdk            vmdk image format support
   vmnet           vmnet.framework network backend support
   vnc             VNC server
   vnc-jpeg        JPEG lossy compression for VNC server
   vnc-sasl        SASL authentication for VNC server
+  vpc             vpc image format support
   vte             vte support for the gtk UI
   vvfat           vvfat image format support
+  werror          Treat warnings as errors
   whpx            WHPX acceleration support
   xen             Xen backend support
   xen-pci-passthrough
@@ -325,11 +341,6 @@ disabled with --disable-FEATURE, default is enabled if available
   linux-user      all linux usermode emulation targets
   bsd-user        all BSD usermode emulation targets
   pie             Position Independent Executables
-  modules         modules support (non-Windows)
-  debug-tcg       TCG debugging (default is disabled)
-  debug-info      debugging information
-  safe-stack      SafeStack Stack Smash Protection. Depends on
-                  clang/llvm and requires coroutine backend ucontext.
 
 NOTE: The object files are built at the place where configure is launched
 ```
@@ -394,7 +405,7 @@ a *QCOW2* image in a directory named after the AppImage inside
          -v ./input:/input -v ./output:/output \
          docker.io/aguslr/qemu-appimage:latest \
          --target-list=sparc-softmmu --disable-vnc && \
-         ./output/Solaris_9-8.1.3-x86_64.AppImage -snapshot -monitor stdio
+         ./output/Solaris_9-8.2.0-x86_64.AppImage -snapshot -monitor stdio
 
 <picture>
   <source media="(prefers-color-scheme: light)" srcset="screenshots/solaris9-light.png">
@@ -410,7 +421,7 @@ a *QCOW2* image in a directory named after the AppImage inside
          -v ./input:/input -v ./output:/output \
          docker.io/aguslr/qemu-appimage:latest \
          --target-list=ppc-softmmu --disable-pa --disable-slirp && \
-         ./output/Mac_OS_9.2-8.1.3-x86_64.AppImage -snapshot -vnc :0
+         ./output/Mac_OS_9.2-8.2.0-x86_64.AppImage -snapshot -vnc :0
 
 <picture>
   <source media="(prefers-color-scheme: light)" srcset="screenshots/macos9-light.png">
