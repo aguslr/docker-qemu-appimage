@@ -15,7 +15,7 @@ to the `configure` script](#container) before compiling QEMU:
 
 1. Clone and start the container:
 
-       docker run -v ./output:/output \
+       docker run -v "${PWD}"/output:/output \
          docker.io/aguslr/qemu-appimage:latest --target-list=i386-softmmu
 
 2. Run the generated AppImage in `./output`:
@@ -51,7 +51,7 @@ RAM:
 
     docker run --rm -e APP_NAME='Pentium 3' -e QEMU_VER='7.2.1' \
       -e QEMU_OPTS='qemu-system-i386 -cpu pentium 3 -m 64' \
-      -v ./output:/output \
+      -v "${PWD}"/output:/output \
       docker.io/aguslr/qemu-appimage:latest --target-list=i386-softmmu && \
       ./output/qemu-system-i386-7.2.1-x86_64.AppImage --help
 
@@ -402,7 +402,7 @@ a *QCOW2* image in a directory named after the AppImage inside
 
        docker run --rm -e APP_NAME='Solaris 9' \
          -e QEMU_OPTS='qemu-system-sparc -M SS-5 -m 256 -vga cg3 -g 1024x768' \
-         -v ./input:/input -v ./output:/output \
+         -v "${PWD}"/input:/input -v "${PWD}"/output:/output \
          docker.io/aguslr/qemu-appimage:latest \
          --target-list=sparc-softmmu --disable-vnc && \
          ./output/Solaris_9-8.2.0-x86_64.AppImage -snapshot -monitor stdio
@@ -418,7 +418,7 @@ a *QCOW2* image in a directory named after the AppImage inside
 
        docker run --rm -e APP_NAME='Mac OS 9.2' \
          -e QEMU_OPTS='qemu-system-ppc -machine mac99 -m 256 -nic none -g 1024x768x32' \
-         -v ./input:/input -v ./output:/output \
+         -v "${PWD}"/input:/input -v "${PWD}"/output:/output \
          docker.io/aguslr/qemu-appimage:latest \
          --target-list=ppc-softmmu --disable-pa --disable-slirp && \
          ./output/Mac_OS_9.2-8.2.0-x86_64.AppImage -snapshot -vnc :0
