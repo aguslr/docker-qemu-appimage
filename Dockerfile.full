@@ -85,7 +85,7 @@ RUN \
 
 WORKDIR /src
 
-COPY entrypoint.sh /entrypoint.sh
+COPY rootfs/ /
 
 VOLUME /src /input /output
 
