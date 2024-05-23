@@ -4,36 +4,43 @@ FROM docker.io/${BASE_IMAGE}
 
 ENV QEMU_VER=8.2.0
 
-RUN \
-  apt-get update && \
-  env DEBIAN_FRONTEND=noninteractive \
-  apt-get install -y \
-  wget imagemagick file build-essential python3-pip && \
-  apt-get install -y --no-install-recommends \
-  bison flex ninja-build valgrind \
-  libcap-ng-dev \
-  libepoxy-dev \
-  libpixman-1-dev \
-  libpmem-dev \
-  libpulse-dev \
-  libsdl2-dev libsdl2-image-dev \
-  libslirp-dev \
-  libspice-server-dev \
-  libusb-1.0-0-dev libusb-dev libusbredirhost-dev \
-  libvncserver-dev \
-  -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold" \
-  && apt-get clean && rm -rf /var/lib/apt/lists/* /var/lib/apt/lists/*
+RUN <<-EOT bash
+	set -eu
 
-RUN \
-  wget -c -nv -P / \
-  "https://download.qemu.org/qemu-${QEMU_VER}.tar.xz" && \
-  wget -c -nv \
-  "https://github.com/probonopd/linuxdeployqt/releases/download/continuous/linuxdeployqt-continuous-$(uname -m).AppImage" \
-  -O /usr/local/bin/linuxdeployqt.appimage && \
-  chmod a+x /usr/local/bin/linuxdeployqt.appimage && \
-  mkdir -p /opt/linuxdeploy && cd /opt/linuxdeploy && \
-  /usr/local/bin/linuxdeployqt.appimage --appimage-extract && \
-  rm -f /usr/local/bin/linuxdeployqt.appimage
+	env DEBIAN_FRONTEND=noninteractive
+	apt-get update
+
+	apt-get install -y \
+		wget imagemagick file build-essential python3-pip
+
+	apt-get install -y --no-install-recommends \
+		bison flex ninja-build valgrind \
+		libcap-ng-dev \
+		libepoxy-dev \
+		libpixman-1-dev \
+		libpmem-dev \
+		libpulse-dev \
+		libsdl2-dev libsdl2-image-dev \
+		libslirp-dev \
+		libspice-server-dev \
+		libusb-1.0-0-dev libusb-dev libusbredirhost-dev \
+		libvncserver-dev \
+		-o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold"
+
+	apt-get clean && rm -rf /var/lib/apt/lists/* /var/lib/apt/lists/*
+
+	wget -c -nv -P / \
+		"https://download.qemu.org/qemu-${QEMU_VER}.tar.xz"
+
+	wget -c -nv \
+		"https://github.com/probonopd/linuxdeployqt/releases/download/continuous/linuxdeployqt-continuous-$(uname -m).AppImage" \
+		-O /usr/local/bin/linuxdeployqt.appimage && \
+		chmod a+x /usr/local/bin/linuxdeployqt.appimage
+
+	mkdir -p /opt/linuxdeploy && cd /opt/linuxdeploy && \
+		/usr/local/bin/linuxdeployqt.appimage --appimage-extract && \
+		rm -f /usr/local/bin/linuxdeployqt.appimage
+EOT
 
 WORKDIR /src
 
