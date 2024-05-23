@@ -109,31 +109,8 @@ jobs:
             org.opencontainers.image.base.name=docker.io/${{ env.IMAGE_BASE }}
           tags: |
             type=raw,value=${{ matrix.custom_tag }}
-
-      - name: Extract Docker latest tag
-        if: |
-          github.event_name != 'pull_request' && matrix.is_latest == true
-        id: meta_latest
-        uses: docker/metadata-action@v5
-        with:
-          images: |
-            ${{ env.REGISTRY_URL }}/${{ env.REGISTRY_USERNAME }}/${{ env.IMAGE_NAME }}
-          flavor: |
-            latest=false
-          tags: |
-            type=raw,value=latest
-
-      - name: Extract Docker PR tag
-        if: github.event_name == 'pull_request'
-        id: meta_pr
-        uses: docker/metadata-action@v5
-        with:
-          images: |
-            ${{ env.REGISTRY_URL }}/${{ env.REGISTRY_USERNAME }}/${{ env.REPO_NAME }}
-          flavor: |
-            latest=false
-          tags: |
-            type=ref,suffix=-${{ matrix.custom_tag }},event=pr
+            type=raw,value=latest,enable=${{ github.event_name != 'pull_request' && matrix.is_latest == true }}
+            type=ref,suffix=-${{ matrix.custom_tag }},event=pr,enable=${{ github.event_name == 'pull_request' }}
 
       - name: Build and push Docker image
         id: build-and-push
@@ -147,8 +124,5 @@ jobs:
           build-args: |
             BASE_IMAGE=${{ env.IMAGE_BASE }}
           push: true
-          tags: |
-            ${{ steps.meta.outputs.tags }}
-            ${{ steps.meta_latest.outputs.tags }}
-            ${{ steps.meta_pr.outputs.tags }}
+          tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
