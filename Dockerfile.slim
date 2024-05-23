@@ -7,13 +7,14 @@ ENV QEMU_VER=8.2.0
 RUN <<-EOT bash
 	set -eu
 
-	env DEBIAN_FRONTEND=noninteractive
 	apt-get update
 
-	apt-get install -y \
+	env DEBIAN_FRONTEND=noninteractive \
+		apt-get install -y \
 		wget imagemagick file build-essential python3-pip
 
-	apt-get install -y --no-install-recommends \
+	env DEBIAN_FRONTEND=noninteractive \
+		apt-get install -y --no-install-recommends \
 		bison flex ninja-build valgrind \
 		libcap-ng-dev \
 		libepoxy-dev \
