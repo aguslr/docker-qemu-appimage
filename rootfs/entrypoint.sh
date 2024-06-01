@@ -52,7 +52,7 @@ makeAppImage() {
 	Terminal=false
 	Type=Application
 	Icon=qemu
-	Categories=System;Emulator;
+	Categories=System;Emulator;X-QEMU-AppImage;
 	EOF
 
 	# Create AppRun script
