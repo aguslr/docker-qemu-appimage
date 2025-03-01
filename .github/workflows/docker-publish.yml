@@ -48,13 +48,13 @@ jobs:
     needs: variables
     runs-on: ubuntu-latest
     env:
-      IMAGE_NAME: ${{ needs.variables.outputs.image_name }}
+      IMAGE_NAME: ${{ github.event_name != 'pull_request' && needs.variables.outputs.image_name || github.event.repository.name }}
     outputs:
       image-needs-updating: ${{ steps.check.outputs.needs-updating }}
     steps:
       - name: Check if update available
         id: check
-        uses: lucacome/docker-image-update-checker@v1.2.1
+        uses: lucacome/docker-image-update-checker@v1.2.0
         with:
           base-image: ${{ env.IMAGE_BASE }}
           image: ${{ env.REGISTRY_USERNAME }}/${{ env.IMAGE_NAME }}
@@ -65,7 +65,7 @@ jobs:
     needs: [check, variables]
 
     env:
-      IMAGE_NAME: ${{ needs.variables.outputs.image_name }}
+      IMAGE_NAME: ${{ github.event_name != 'pull_request' && needs.variables.outputs.image_name || github.event.repository.name }}
 
     if: |
       github.event_name != 'schedule' ||
@@ -97,7 +97,6 @@ jobs:
           password: ${{ env.REGISTRY_PASSWORD }}
 
       - name: Extract Docker metadata
-        if: github.event_name != 'pull_request'
         id: meta
         uses: docker/metadata-action@v5
         with:
@@ -108,7 +107,7 @@ jobs:
           labels: |
             org.opencontainers.image.base.name=docker.io/${{ env.IMAGE_BASE }}
           tags: |
-            type=raw,value=${{ matrix.custom_tag }}
+            type=raw,value=${{ matrix.custom_tag }},enable=${{ github.event_name != 'pull_request' }}
             type=raw,value=latest,enable=${{ github.event_name != 'pull_request' && matrix.is_latest == true }}
             type=ref,suffix=-${{ matrix.custom_tag }},event=pr,enable=${{ github.event_name == 'pull_request' }}
 
