@@ -1,4 +1,4 @@
-ARG BASE_IMAGE=library/ubuntu:focal
+ARG BASE_IMAGE=library/ubuntu:jammy
 
 FROM docker.io/${BASE_IMAGE}
 
@@ -15,7 +15,7 @@ RUN <<-EOT bash
 
 	env DEBIAN_FRONTEND=noninteractive \
 		apt-get install -y --no-install-recommends \
-		git bison flex ninja-build python3-venv valgrind \
+		git bison flex ninja-build python3-venv python3-tomli valgrind \
 		libaio-dev \
 		libbluetooth-dev \
 		libbpf-dev \

@@ -1,4 +1,4 @@
-ARG BASE_IMAGE=library/ubuntu:focal
+ARG BASE_IMAGE=library/ubuntu:jammy
 
 FROM docker.io/${BASE_IMAGE}
 
@@ -15,7 +15,7 @@ RUN <<-EOT bash
 
 	env DEBIAN_FRONTEND=noninteractive \
 		apt-get install -y --no-install-recommends \
-		bison flex ninja-build valgrind \
+		bison flex ninja-build python3-tomli valgrind \
 		libcap-ng-dev \
 		libepoxy-dev \
 		libpixman-1-dev \
