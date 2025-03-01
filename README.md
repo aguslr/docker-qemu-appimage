@@ -43,7 +43,7 @@ The image is configured using environment variables passed at runtime:
 | Variable    | Function                    | Default         | Required |
 | :---------- | :-------------------------- | :-------------- | -------- |
 | `APP_NAME`  | Name of the app to package  | `qemu-system-*` | N        |
-| `QEMU_VER`  | Version of QEMU to compile  | `8.2.0`         | N        |
+| `QEMU_VER`  | Version of QEMU to compile  | `9.2.2`         | N        |
 | `QEMU_OPTS` | Custom QEMU runtime options | EMPTY           | N        |
 
 Here's an example to create an AppImage for a Pentium 3 machine with 64 MB of
@@ -62,8 +62,8 @@ Options
 ### Container
 
 Any argument for the container image will be passed to [the `configure`
-script][2] used to enable or disable QEMU features at build time. For QEMU
-version 8.2.0, these are the available options:
+script][2] used to enable or disable QEMU features at build time. These are some
+of the available options:
 
 <details><summary>Options</summary>
 

@@ -2,7 +2,7 @@ ARG BASE_IMAGE=library/ubuntu:focal
 
 FROM docker.io/${BASE_IMAGE}
 
-ENV QEMU_VER=8.2.0
+ENV QEMU_VER=9.2.2
 
 RUN <<-EOT bash
 	set -eu
