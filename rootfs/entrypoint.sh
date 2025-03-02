@@ -169,14 +169,12 @@ makeAppImage() {
 		# Clean up existing icons
 		rm -rf /AppDir/usr/share/icons/hicolor
 		# Create icon directory
-		mkdir -p /AppDir/usr/share/icons/hicolor/scalable/apps/ || exit
-		# Copy SVG file to icon directory
-		cp -f /input/icon.svg /AppDir/usr/share/icons/hicolor/scalable/apps/qemu.svg
+		mkdir -p /AppDir/usr/share/icons/hicolor/256x256/apps/ || exit
 		# Generate PNG icon
 		convert -gravity center -background none -size 256x256^ -extent 256x256^ \
-			/AppDir/usr/share/icons/hicolor/scalable/apps/qemu.svg /AppDir/qemu.png
+			/input/icon.svg /AppDir/usr/share/icons/hicolor/256x256/apps/qemu.png
 		# Set icon file variable
-		icon_file=/AppDir/usr/share/icons/hicolor/scalable/apps/qemu.svg
+		icon_file=/AppDir/usr/share/icons/hicolor/256x256/apps/qemu.png
 	elif [ -f /input/icon.png ]; then
 		# Get PNG icon size
 		icon_dir="$(identify -format "%wx%h" /input/icon.png)"
@@ -186,12 +184,11 @@ makeAppImage() {
 		mkdir -p /AppDir/usr/share/icons/hicolor/"${icon_dir}"/apps/ || exit
 		# Copy PNG icons
 		cp -f /input/icon.png /AppDir/usr/share/icons/hicolor/"${icon_dir}"/apps/qemu.png
-		cp -f /input/icon.png /AppDir/qemu.png
 		# Set icon file variable
 		icon_file=/AppDir/usr/share/icons/hicolor/"${icon_dir}"/apps/qemu.png
 	else
 		# Set icon file variable
-		icon_file=/AppDir/usr/share/icons/hicolor/scalable/apps/qemu.svg
+		icon_file=/AppDir/usr/share/icons/hicolor/256x256/apps/qemu.png
 	fi
 
 	# Copy binaries and images
