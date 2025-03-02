@@ -36,13 +36,13 @@ RUN <<-EOT bash
 		"https://download.qemu.org/qemu-${QEMU_VER}.tar.xz"
 
 	wget -c -nv \
-		"https://github.com/probonopd/linuxdeployqt/releases/download/continuous/linuxdeployqt-continuous-$(uname -m).AppImage" \
-		-O /usr/local/bin/linuxdeployqt.appimage && \
-		chmod a+x /usr/local/bin/linuxdeployqt.appimage
+		"https://github.com/linuxdeploy/linuxdeploy/releases/download/continuous/linuxdeploy-$(uname -m).AppImage" \
+		-O /usr/local/bin/linuxdeploy.appimage && \
+		chmod a+x /usr/local/bin/linuxdeploy.appimage
 
 	mkdir -p /opt/linuxdeploy && cd /opt/linuxdeploy && \
-		/usr/local/bin/linuxdeployqt.appimage --appimage-extract && \
-		rm -f /usr/local/bin/linuxdeployqt.appimage
+		/usr/local/bin/linuxdeploy.appimage --appimage-extract && \
+		rm -f /usr/local/bin/linuxdeploy.appimage
 EOT
 
 WORKDIR /src

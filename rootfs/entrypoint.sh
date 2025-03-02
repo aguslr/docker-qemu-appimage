@@ -175,6 +175,8 @@ makeAppImage() {
 		# Generate PNG icon
 		convert -gravity center -background none -size 256x256^ -extent 256x256^ \
 			/AppDir/usr/share/icons/hicolor/scalable/apps/qemu.svg /AppDir/qemu.png
+		# Set icon file variable
+		icon_file=/AppDir/usr/share/icons/hicolor/scalable/apps/qemu.svg
 	elif [ -f /input/icon.png ]; then
 		# Get PNG icon size
 		icon_dir="$(identify -format "%wx%h" /input/icon.png)"
@@ -185,6 +187,11 @@ makeAppImage() {
 		# Copy PNG icons
 		cp -f /input/icon.png /AppDir/usr/share/icons/hicolor/"${icon_dir}"/apps/qemu.png
 		cp -f /input/icon.png /AppDir/qemu.png
+		# Set icon file variable
+		icon_file=/AppDir/usr/share/icons/hicolor/"${icon_dir}"/apps/qemu.png
+	else
+		# Set icon file variable
+		icon_file=/AppDir/usr/share/icons/hicolor/scalable/apps/qemu.svg
 	fi
 
 	# Copy binaries and images
@@ -198,8 +205,12 @@ makeAppImage() {
 	unset QTDIR QT_PLUGIN_PATH LD_LIBRARY_PATH
 	(
 		cd /opt/linuxdeploy && \
-			./squashfs-root/AppRun /AppDir/usr/share/applications/*.desktop \
-			-appimage -bundle-non-qt-libs -no-copy-copyright-files -no-plugins -no-translations && \
+			./squashfs-root/AppRun \
+			--appdir /AppDir \
+			--desktop-file /AppDir/usr/share/applications/*.desktop \
+			--executable /AppDir/usr/bin/"${executable}" \
+			--icon-file "${icon_file}" \
+			--output appimage && \
 			find /AppDir -executable -type f -exec ldd {} \; | grep " => /usr" | cut -d " " -f 2-3 | sort | uniq
 		mv -vf ./*.AppImage /output
 	)
