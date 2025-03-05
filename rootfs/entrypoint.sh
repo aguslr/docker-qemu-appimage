@@ -43,8 +43,7 @@ makeAppImage() {
 		\( -name 'qemu-system-*' -and -not -name "${executable}" \) -delete
 
 	# Create desktop entry
-	mkdir -p /AppDir/usr/share/applications/ || return
-	cat <<- EOF > /AppDir/usr/share/applications/qemu.desktop
+	cat <<- EOF > /AppDir/qemu.desktop
 	[Desktop Entry]
 	Name=${NAME}
 	Comment=Emulator
@@ -166,30 +165,17 @@ makeAppImage() {
 
 	# Set App icon
 	if [ -f /input/icon.svg ]; then
-		# Clean up existing icons
-		rm -rf /AppDir/usr/share/icons/hicolor
-		# Create icon directory
-		mkdir -p /AppDir/usr/share/icons/hicolor/256x256/apps/ || exit
-		# Generate PNG icon
-		convert -gravity center -background none -size 256x256^ -extent 256x256^ \
-			/input/icon.svg /AppDir/usr/share/icons/hicolor/256x256/apps/qemu.png
-		# Set icon file variable
-		icon_file=/AppDir/usr/share/icons/hicolor/256x256/apps/qemu.png
+		# Copy icon file
+		cp -f /input/icon.svg /AppDir/qemu.svg
 	elif [ -f /input/icon.png ]; then
-		# Get PNG icon size
-		icon_dir="$(identify -format "%wx%h" /input/icon.png)"
-		# Clean up existing icons
-		rm -rf /AppDir/usr/share/icons/hicolor
-		# Create icon directory
-		mkdir -p /AppDir/usr/share/icons/hicolor/"${icon_dir}"/apps/ || exit
-		# Copy PNG icons
-		cp -f /input/icon.png /AppDir/usr/share/icons/hicolor/"${icon_dir}"/apps/qemu.png
-		# Set icon file variable
-		icon_file=/AppDir/usr/share/icons/hicolor/"${icon_dir}"/apps/qemu.png
+		# Copy icon file
+		cp -f /input/icon.png /AppDir/qemu.png
 	else
-		# Set icon file variable
-		icon_file=/AppDir/usr/share/icons/hicolor/256x256/apps/qemu.png
+		# Copy icon file
+		cp -f /AppDir/usr/share/icons/hicolor/scalable/apps/qemu.svg /AppDir/qemu.svg
 	fi
+	# Create .DirIcon
+	cp -f /AppDir/qemu.??g /AppDir/.DirIcon
 
 	# Copy binaries and images
 	find /input -type f -iname '*.fd' -exec cp -vf {} /AppDir/ \;
@@ -198,15 +184,17 @@ makeAppImage() {
 	find /input -type f \( -iname '*.qcow2' -or -iname '*.img' -or -iname '*.iso' \) \
 		-exec cp -vf {} /AppDir/ \;
 
+	# Cleanup AppDir
+	rm -rf /AppDir/usr/share/applications
+	rm -rf /AppDir/usr/share/docs
+	rm -rf /AppDir/usr/share/icons
+
 	# Create AppImage
 	unset QTDIR QT_PLUGIN_PATH LD_LIBRARY_PATH
 	(
 		cd /opt/linuxdeploy && \
 			./squashfs-root/AppRun \
 			--appdir /AppDir \
-			--desktop-file /AppDir/usr/share/applications/*.desktop \
-			--executable /AppDir/usr/bin/"${executable}" \
-			--icon-file "${icon_file}" \
 			--output appimage && \
 			find /AppDir -executable -type f -exec ldd {} \; | grep " => /usr" | cut -d " " -f 2-3 | sort | uniq
 		mv -vf ./*.AppImage /output
