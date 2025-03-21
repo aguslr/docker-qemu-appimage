@@ -165,17 +165,19 @@ makeAppImage() {
 
 	# Set App icon
 	if [ -f /input/icon.svg ]; then
-		# Copy icon file
-		cp -f /input/icon.svg /AppDir/qemu.svg
+		# Generate PNG icon
+		convert -gravity center -background none -size 256x256^ -extent 256x256^ \
+			/input/icon.svg /AppDir/qemu.png
 	elif [ -f /input/icon.png ]; then
 		# Copy icon file
 		cp -f /input/icon.png /AppDir/qemu.png
 	else
-		# Copy icon file
-		cp -f /AppDir/usr/share/icons/hicolor/scalable/apps/qemu.svg /AppDir/qemu.svg
+		# Generate PNG icon
+		convert -gravity center -background none -size 256x256^ -extent 256x256^ \
+			/AppDir/usr/share/icons/hicolor/scalable/apps/qemu.svg /AppDir/qemu.png
 	fi
 	# Create .DirIcon
-	cp -f /AppDir/qemu.??g /AppDir/.DirIcon
+	ln -sf qemu.png /AppDir/.DirIcon
 
 	# Copy binaries and images
 	find /input -type f -iname '*.fd' -exec cp -vf {} /AppDir/ \;
