@@ -35,14 +35,15 @@ RUN <<-EOT bash
 	wget -c -nv -P / \
 		"https://download.qemu.org/qemu-${QEMU_VER}.tar.xz"
 
-	wget -c -nv \
-		"https://github.com/linuxdeploy/linuxdeploy/releases/download/continuous/linuxdeploy-$(uname -m).AppImage" \
-		-O /usr/local/bin/linuxdeploy.appimage && \
-		chmod a+x /usr/local/bin/linuxdeploy.appimage
 
-	mkdir -p /opt/linuxdeploy && cd /opt/linuxdeploy && \
-		/usr/local/bin/linuxdeploy.appimage --appimage-extract && \
-		rm -f /usr/local/bin/linuxdeploy.appimage
+	wget -c -nv \
+		"https://github.com/AppImage/appimagetool/releases/download/continuous/appimagetool-$(uname -m).AppImage" \
+		-O /usr/local/bin/appimagetool.appimage && \
+		chmod a+x /usr/local/bin/appimagetool.appimage
+
+	mkdir -p /opt/appimagetool && cd /opt/appimagetool && \
+		/usr/local/bin/appimagetool.appimage --appimage-extract && \
+		rm -f /usr/local/bin/appimagetool.appimage
 EOT
 
 WORKDIR /src
