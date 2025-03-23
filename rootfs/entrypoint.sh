@@ -165,6 +165,9 @@ makeAppImage() {
 
 	# Set App icon
 	if [ -f /input/icon.svg ]; then
+		# Copy SVG icon
+		mkdir -p /AppDir/usr/share/icons/hicolor/scalable/apps && \
+			cp -f /input/icon.svg /AppDir/usr/share/icons/hicolor/scalable/apps/qemu.svg
 		# Generate PNG icon
 		convert -gravity center -background none -size 256x256^ -extent 256x256^ \
 			/input/icon.svg /AppDir/qemu.png
@@ -189,7 +192,6 @@ makeAppImage() {
 	# Cleanup AppDir
 	rm -rf /AppDir/usr/share/applications
 	rm -rf /AppDir/usr/share/docs
-	rm -rf /AppDir/usr/share/icons
 
 	# Create AppImage
 	unset QTDIR QT_PLUGIN_PATH LD_LIBRARY_PATH
