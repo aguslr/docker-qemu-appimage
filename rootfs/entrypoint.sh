@@ -47,7 +47,8 @@ makeAppImage() {
 	rm -rf /AppDir/usr/share/doc
 
 	# Create desktop entry
-	cat <<- EOF > /AppDir/qemu.desktop
+	mkdir -p /AppDir/usr/share/applications/ || return
+	cat <<- EOF > /AppDir/usr/share/applications/qemu.desktop
 	[Desktop Entry]
 	Name=${NAME}
 	Comment=Emulator
@@ -169,22 +170,33 @@ makeAppImage() {
 
 	# Set App icon
 	if [ -f /input/icon.svg ]; then
+		# Clean up existing icons
+		rm -rf /AppDir/usr/share/icons/hicolor
+		# Create icon directories
+		mkdir -p /AppDir/usr/share/icons/hicolor/256x256/apps && \
+			mkdir -p /AppDir/usr/share/icons/hicolor/scalable/apps || exit
 		# Copy SVG icon
-		mkdir -p /AppDir/usr/share/icons/hicolor/scalable/apps && \
-			cp -f /input/icon.svg /AppDir/usr/share/icons/hicolor/scalable/apps/qemu.svg
+		cp -f /input/icon.svg /AppDir/usr/share/icons/hicolor/scalable/apps/qemu.svg
 		# Generate PNG icon
 		convert -gravity center -background none -size 256x256^ -extent 256x256^ \
-			/input/icon.svg /AppDir/qemu.png
+			/input/icon.svg /AppDir/usr/share/icons/hicolor/256x256/apps/qemu.png
+		# Set icon file variable
+		icon_file=/AppDir/usr/share/icons/hicolor/256x256/apps/qemu.png
 	elif [ -f /input/icon.png ]; then
-		# Copy icon file
-		cp -f /input/icon.png /AppDir/qemu.png
+		# Clean up existing icons
+		rm -rf /AppDir/usr/share/icons/hicolor
+		# Get PNG icon size
+		icon_dir="$(identify -format "%wx%h" /input/icon.png)"
+		# Create icon directory
+		mkdir -p /AppDir/usr/share/icons/hicolor/"${icon_dir}"/apps/ || exit
+		# Copy PNG icons
+		cp -f /input/icon.png /AppDir/usr/share/icons/hicolor/"${icon_dir}"/apps/qemu.png
+		# Set icon file variable
+		icon_file=/AppDir/usr/share/icons/hicolor/"${icon_dir}"/apps/qemu.png
 	else
-		# Generate PNG icon
-		convert -gravity center -background none -size 256x256^ -extent 256x256^ \
-			/AppDir/usr/share/icons/hicolor/scalable/apps/qemu.svg /AppDir/qemu.png
+		# Set icon file variable
+		icon_file=/AppDir/usr/share/icons/hicolor/256x256/apps/qemu.png
 	fi
-	# Create .DirIcon
-	ln -sf qemu.png /AppDir/.DirIcon
 
 	# Copy binaries and images
 	find /input -type f -iname '*.fd' -exec cp -vf {} /AppDir/ \;
@@ -199,6 +211,9 @@ makeAppImage() {
 		cd /opt/linuxdeploy && \
 			./squashfs-root/AppRun \
 			--appdir /AppDir \
+			--desktop-file /AppDir/usr/share/applications/*.desktop \
+			--executable /AppDir/usr/bin/"${executable}" \
+			--icon-file "${icon_file}" \
 			--output appimage && \
 			find /AppDir -executable -type f -exec ldd {} \; | grep " => /usr" | cut -d " " -f 2-3 | sort | uniq
 		mv -vf ./*.AppImage /output
