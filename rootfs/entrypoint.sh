@@ -42,6 +42,10 @@ makeAppImage() {
 	find /AppDir -executable -type f \
 		\( -name 'qemu-system-*' -and -not -name "${executable}" \) -delete
 
+	# Cleanup AppDir
+	rm -rf /AppDir/usr/share/applications
+	rm -rf /AppDir/usr/share/doc
+
 	# Create desktop entry
 	cat <<- EOF > /AppDir/qemu.desktop
 	[Desktop Entry]
@@ -188,10 +192,6 @@ makeAppImage() {
 		-exec cp -vf {} /AppDir/ \;
 	find /input -type f \( -iname '*.qcow2' -or -iname '*.img' -or -iname '*.iso' \) \
 		-exec cp -vf {} /AppDir/ \;
-
-	# Cleanup AppDir
-	rm -rf /AppDir/usr/share/applications
-	rm -rf /AppDir/usr/share/docs
 
 	# Create AppImage
 	unset QTDIR QT_PLUGIN_PATH LD_LIBRARY_PATH
