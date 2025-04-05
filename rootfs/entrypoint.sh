@@ -38,9 +38,14 @@ makeAppImage() {
 	# Install QEMU and clean up
 	make DESTDIR=/AppDir -j"$(nproc)" install && rm -rf /AppDir/var
 
-	# Remove unnecessary QEMU binaries
-	find /AppDir -executable -type f \
+	if [ "${executable}" = 'qemu' ]; then
+		# Create link to binary
+		(cd /AppDir/usr/bin && ln -sf "qemu-system-$(uname -m)" qemu)
+	else
+		# Remove unnecessary QEMU binaries
+		find /AppDir -executable -type f \
 		\( -name 'qemu-system-*' -and -not -name "${executable}" \) -delete
+	fi
 
 	# Cleanup AppDir
 	rm -rf /AppDir/usr/share/applications
@@ -253,10 +258,15 @@ fi
 
 # Configure AppDir
 if [ "${executable}" ]; then
-		# Set name
-		NAME="${APP_NAME:-$executable}"
-		# Run function
-		makeAppImage "${executable}"
+	# Set name
+	NAME="${APP_NAME:-$executable}"
+	# Run function
+	makeAppImage "${executable}"
+elif [ "${APP_NAME}" = 'qemu' ]; then
+	# Set name
+	NAME="${APP_NAME}"
+	# Run function
+	makeAppImage qemu
 else
 	find . -executable -type f -name 'qemu-system-*' -print | while IFS= read -r file; do
 		# Set executable
