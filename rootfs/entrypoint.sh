@@ -258,7 +258,7 @@ if [ "${executable}" ]; then
 		# Run function
 		makeAppImage "${executable}"
 else
-	find ./*-softmmu -name 'qemu-system-*' -print | while IFS= read -r file; do
+	find . -executable -type f -name 'qemu-system-*' -print | while IFS= read -r file; do
 		# Set executable
 		executable="$(basename "${file}")"
 		# Set name
