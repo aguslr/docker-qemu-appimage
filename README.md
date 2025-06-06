@@ -43,16 +43,16 @@ The image is configured using environment variables passed at runtime:
 | Variable    | Function                    | Default         | Required |
 | :---------- | :-------------------------- | :-------------- | -------- |
 | `APP_NAME`  | Name of the app to package  | `qemu-system-*` | N        |
-| `QEMU_VER`  | Version of QEMU to compile  | `9.2.2`         | N        |
+| `QEMU_VER`  | Version of QEMU to compile  | `10.0.2`        | N        |
 | `QEMU_OPTS` | Custom QEMU runtime options | EMPTY           | N        |
 
 If use *qemu* as the name of the app to package, this will create an AppImage
 with all QEMU binaries:
 
-    docker run --rm -e APP_NAME='qemu' -e QEMU_VER='9.2.2' \
+    docker run --rm -e APP_NAME='qemu' -e QEMU_VER='10.0.2' \
       -v "${PWD}"/output:/output \
       docker.io/aguslr/qemu-appimage:latest && \
-      ./output/qemu-9.2.2-x86_64.AppImage --command=qemu-system-sparc --help
+      ./output/qemu-10.0.2-x86_64.AppImage --command=qemu-system-sparc --help
 
 Here's an example to create an AppImage for a Pentium 3 machine with 64 MB of
 RAM:

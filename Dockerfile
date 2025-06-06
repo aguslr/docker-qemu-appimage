@@ -1,7 +1,7 @@
 ARG BASE_IMAGE=library/ubuntu:jammy
 
 FROM docker.io/${BASE_IMAGE} AS builder
-ENV QEMU_VER=9.2.2
+ENV QEMU_VER=10.0.2
 COPY rootfs/ /
 WORKDIR /src
 RUN <<-EOT bash
