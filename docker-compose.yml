@@ -5,7 +5,8 @@ services:
     container_name: qemu-appimage
     build:
       context: .
-      dockerfile: ./Dockerfile.full
+      dockerfile: ./Dockerfile
+      target: full
     volumes:
       - ./input:/input
       - ./output:/output

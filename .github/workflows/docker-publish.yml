@@ -118,8 +118,8 @@ jobs:
           ACTIONS_RUNTIME_TOKEN: ''
         with:
           context: .
-          file: |
-            ./Dockerfile.${{ matrix.custom_tag }}
+          file: ./Dockerfile
+          target: ${{ matrix.custom_tag }}
           build-args: |
             BASE_IMAGE=${{ env.IMAGE_BASE }}
           push: true
